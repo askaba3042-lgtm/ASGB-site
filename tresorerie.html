@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Trésorerie — ASGB</title>
+<link id="fav" rel="icon" href="">
+<style>
+  :root{
+    --navy:#12234B; --navy-deep:#0C1832; --navy-soft:#2C3E6B;
+    --gold:#C9A24B; --gold-soft:#F4EBD7; --gold-ink:#7A5E1C;
+    --rouge:#C31B2B; --jaune:#E9A825; --vert:#1F8A45;
+    --ink:#18213A; --body:#4A5670; --soft:#7A849B;
+    --line:#E4E9F2; --bg:#FFFFFF; --bg-alt:#F5F7FB;
+    --ok-bg:#E7F4EC; --ok-ink:#14532D; --ok-line:#BFE3CC;
+    --bad-bg:#FBEAEA; --bad-ink:#8F1620; --bad-line:#F2C4C9;
+    --chart-rec:#1F8A45; --chart-dep:#B08427;
+    --sans:'Helvetica Neue',Helvetica,'Segoe UI',Arial,sans-serif;
+    --shadow:0 10px 30px rgba(18,35,75,.08);
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg-alt);font-size:16px;line-height:1.5}
+  button{font:inherit;cursor:pointer;background:none;border:none;color:inherit;touch-action:manipulation}
+  input,select,textarea{font:inherit;color:var(--ink)}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+  /* ---------- Topbar ---------- */
+  .topbar{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50}
+  .topbar .mark{width:38px;height:38px;flex:none;background:#fff;border-radius:10px;padding:3px}
+  .topbar h1{font-size:17px;font-weight:700;letter-spacing:.2px;line-height:1.2}
+  .topbar h1 span{display:block;font-size:11.5px;font-weight:400;color:#C7D0E4;letter-spacing:.4px}
+  .topbar h1{margin-right:auto}
+  .sync-pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#E7ECF7;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 12px;white-space:nowrap}
+  .sync-pill i{width:8px;height:8px;border-radius:50%;background:#8b93a7;flex:none}
+  .sync-pill[data-etat="ok"] i{background:#3FBF6F}
+  .sync-pill[data-etat="hors-ligne"] i{background:var(--jaune)}
+  @media(max-width:700px){.sync-pill b{display:none}.sync-pill{padding:6px 8px}}
+  .balance-pill{background:rgba(255,255,255,.08);border:1px solid rgba(201,162,75,.55);border-radius:999px;padding:7px 16px;text-align:right}
+  .balance-pill .l{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:#C7D0E4}
+  .balance-pill .v{font-size:17px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  /* ---------- Tabs ---------- */
+  .tabs{background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:2px;overflow-x:auto;padding:0 12px;position:sticky;top:62px;z-index:40;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{display:flex;align-items:center;gap:7px;padding:13px 14px 11px;font-size:14.5px;font-weight:600;color:var(--body);border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s}
+  .tab svg{width:17px;height:17px;flex:none}
+  .tab:hover{color:var(--navy)}
+  .tab.active{color:var(--navy);border-bottom-color:var(--gold)}
+
+  /* ---------- Layout ---------- */
+  .view{max-width:1220px;margin:0 auto;padding:22px 18px 70px}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+  .card-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .card-h h2{font-size:16.5px;font-weight:700}
+  .card-h .spacer{flex:1}
+  .muted{color:var(--soft);font-size:13.5px}
+  .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+
+  /* ---------- Buttons ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:600;min-height:42px;border:1px solid transparent;transition:background .15s,border-color .15s,color .15s;cursor:pointer}
+  .btn svg{width:16px;height:16px;flex:none}
+  .btn-primary{background:var(--navy);color:#fff}
+  .btn-primary:hover{background:var(--navy-soft)}
+  .btn-gold{background:var(--gold);color:var(--navy-deep)}
+  .btn-gold:hover{background:#B8913C}
+  .btn-ghost{background:var(--bg);border-color:var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--soft);background:var(--bg-alt)}
+  .btn-danger{background:var(--rouge);color:#fff}
+  .btn-danger:hover{background:#A31221}
+  .btn-danger-ghost{background:var(--bg);border-color:var(--bad-line);color:var(--bad-ink)}
+  .btn-danger-ghost:hover{background:var(--bad-bg)}
+  .btn-sm{padding:6px 11px;min-height:34px;font-size:13px;border-radius:8px}
+  .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;color:var(--body);border:1px solid transparent}
+  .icon-btn:hover{background:var(--bg-alt);color:var(--navy);border-color:var(--line)}
+  .icon-btn svg{width:16px;height:16px}
+
+  /* ---------- Year nav ---------- */
+  .year-nav{display:inline-flex;align-items:center;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:2px}
+  .year-nav .yv{font-weight:700;font-size:15px;padding:0 10px;min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+  .year-nav button{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--body)}
+  .year-nav button:hover{background:var(--bg-alt);color:var(--navy)}
+  .year-nav svg{width:16px;height:16px}
+
+  /* ---------- KPI ---------- */
+  .grid-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  @media(max-width:920px){.grid-kpi{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.grid-kpi{grid-template-columns:1fr}}
+  .kpi{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;display:flex;flex-direction:column;gap:4px;border-top:3px solid var(--navy)}
+  .kpi.t-gold{border-top-color:var(--gold)}
+  .kpi.t-green{border-top-color:var(--vert)}
+  .kpi.t-red{border-top-color:var(--rouge)}
+  .kpi .k-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--soft);display:flex;align-items:center;gap:6px}
+  .kpi .k-label svg{width:14px;height:14px}
+  .kpi .k-value{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.15}
+  .kpi .k-sub{font-size:13px;color:var(--body)}
+  .kpi .bar{height:7px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}
+  .kpi .bar i{display:block;height:100%;background:var(--vert);border-radius:99px}
+
+  /* ---------- Tables ---------- */
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--soft);background:var(--bg-alt);font-weight:600;position:sticky;top:0}
+  tbody tr:hover{background:#FAFBFE}
+  tbody tr:last-child td{border-bottom:none}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tfoot td{background:var(--bg-alt);font-weight:700;border-top:2px solid var(--line);font-variant-numeric:tabular-nums}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;border:1px solid}
+  .badge svg{width:11px;height:11px}
+  .badge.green{background:var(--ok-bg);color:var(--ok-ink);border-color:var(--ok-line)}
+  .badge.red{background:var(--bad-bg);color:var(--bad-ink);border-color:var(--bad-line)}
+  .badge.gray{background:var(--bg-alt);color:var(--body);border-color:var(--line)}
+  .badge.gold{background:var(--gold-soft);color:var(--gold-ink);border-color:#E4D2A6}
+
+  /* ---------- Search ---------- */
+  .searchbox{position:relative;flex:1;min-width:180px;max-width:320px}
+  .searchbox svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--soft);pointer-events:none}
+  .searchbox input{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--line);border-radius:10px;background:var(--bg);min-height:42px}
+  .searchbox input::placeholder{color:var(--soft)}
+
+  .input,select.input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);min-height:44px}
+  textarea.input{min-height:70px;resize:vertical}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field label{font-size:13px;font-weight:600;color:var(--body)}
+  .field .hint{font-size:12px;color:var(--soft)}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .form-grid .full{grid-column:1/-1}
+  @media(max-width:560px){.form-grid{grid-template-columns:1fr}}
+  .req{color:var(--rouge)}
+  .radio-row{display:flex;gap:10px}
+  .radio-pill{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:10px;padding:10px;font-weight:600;cursor:pointer;min-height:44px}
+  .radio-pill input{position:absolute;opacity:0}
+  .radio-pill.rec:has(input:checked){background:var(--ok-bg);border-color:var(--vert);color:var(--ok-ink)}
+  .radio-pill.dep:has(input:checked){background:var(--gold-soft);border-color:var(--gold);color:var(--gold-ink)}
+
+  /* ---------- Cotisations grid ---------- */
+  .cot-scroll{overflow:auto;max-height:66vh;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+  .cot-table th,.cot-table td{padding:7px 8px;text-align:center}
+  .cot-table th:first-child,.cot-table td:first-child{text-align:left;position:sticky;left:0;background:var(--bg);z-index:2;border-right:1px solid var(--line);min-width:170px;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+  .cot-table thead th{z-index:3}
+  .cot-table thead th:first-child{z-index:4;background:var(--bg-alt)}
+  .cot-table tbody tr:hover td:first-child{background:#FAFBFE}
+  .cot-table tfoot td:first-child{background:var(--bg-alt)}
+  .cell{width:34px;height:34px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent;transition:transform .1s,border-color .15s}
+  .cell svg{width:15px;height:15px}
+  .cell:active{transform:scale(.92)}
+  .cell.paid{background:var(--ok-bg);color:var(--ok-ink);border-color:var(--ok-line)}
+  .cell.paid:hover{border-color:var(--vert)}
+  .cell.late{background:var(--bad-bg);color:var(--bad-ink);border-color:var(--bad-line)}
+  .cell.late:hover{border-color:var(--rouge)}
+  .cell.due{background:var(--bg);border:1px dashed var(--line);color:var(--soft)}
+  .cell.due:hover{border-color:var(--vert);color:var(--vert);border-style:solid}
+  .cell-na{color:var(--soft);opacity:.55}
+  .cot-name .sub{display:block;font-size:11.5px;color:var(--soft)}
+  .th-all{display:flex;align-items:center;justify-content:center;margin:3px auto 0;width:28px;height:22px;border-radius:6px;border:1px solid var(--ok-line);background:var(--ok-bg);color:var(--ok-ink)}
+  .th-all:hover{border-color:var(--vert)}
+  .th-all svg{width:12px;height:12px}
+  .legend-cells{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--body);margin-top:12px}
+  .legend-cells span{display:inline-flex;align-items:center;gap:7px}
+  .legend-cells .cell{width:24px;height:24px;border-radius:7px;pointer-events:none}
+  .legend-cells .cell svg{width:12px;height:12px}
+
+  /* ---------- Chart ---------- */
+  .chart-wrap{position:relative}
+  .chart-legend{display:flex;gap:18px;align-items:center;font-size:13px;color:var(--body);margin-bottom:6px;flex-wrap:wrap}
+  .chart-legend span{display:inline-flex;align-items:center;gap:7px}
+  .chart-legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .chart-tip{position:absolute;pointer-events:none;background:var(--navy-deep);color:#fff;border-radius:9px;padding:9px 12px;font-size:12.5px;line-height:1.5;box-shadow:0 6px 20px rgba(12,24,50,.35);opacity:0;transition:opacity .12s;z-index:5;min-width:150px}
+  .chart-tip b{color:var(--gold);display:block;margin-bottom:2px;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  .chart-tip .row{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
+  .chart-tip .row i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:5px}
+  .chart-svg text{font-family:var(--sans);fill:var(--soft);font-size:11px}
+  .chart-svg .hit{fill:transparent;cursor:pointer}
+  .chart-svg .hl{fill:var(--bg-alt);opacity:0;pointer-events:none}
+  .chart-svg .hit:hover + .hl,.chart-svg .hit:focus-visible + .hl{opacity:1}
+
+  /* ---------- Late list ---------- */
+  .late-item{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
+  .late-item:last-child{border-bottom:none}
+  .late-item .who{flex:1;min-width:0}
+  .late-item .who b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .late-item .who small{color:var(--soft);font-size:12.5px}
+  .late-item .amt{font-weight:700;color:var(--bad-ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .two-col{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
+  @media(max-width:900px){.two-col{grid-template-columns:1fr}}
+
+  /* ---------- Empty state ---------- */
+  .empty{text-align:center;padding:38px 20px;color:var(--body)}
+  .empty svg{width:38px;height:38px;color:var(--soft);margin-bottom:10px}
+  .empty p{margin-bottom:14px}
+
+  /* ---------- Welcome ---------- */
+  .welcome{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-soft) 100%);color:#fff;border:none}
+  .welcome h2{font-size:19px;margin-bottom:6px}
+  .welcome p{color:#C7D0E4;font-size:14.5px;max-width:640px}
+  .welcome ol{margin:14px 0 18px 20px;color:#E7ECF7;font-size:14.5px;display:grid;gap:6px}
+  .welcome .btn-ghost{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff}
+  .welcome .btn-ghost:hover{background:rgba(255,255,255,.2)}
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(12,24,50,.55);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:24px 14px;overflow-y:auto}
+  .modal{background:var(--bg);border-radius:16px;box-shadow:0 24px 60px rgba(12,24,50,.35);width:100%;max-width:560px;margin:auto 0;animation:pop .18s ease-out}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+  .modal-h{display:flex;align-items:center;gap:10px;padding:18px 20px 0}
+  .modal-h h3{font-size:17px;font-weight:700;flex:1}
+  .modal-b{padding:16px 20px}
+  .modal-f{display:flex;gap:10px;padding:0 20px 20px;flex-wrap:wrap}
+  .modal-f .spacer{flex:1}
+  .check-list{max-height:300px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;margin-bottom:14px}
+  .check-list label{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px}
+  .check-list label:last-child{border-bottom:none}
+  .check-list label:hover{background:var(--bg-alt)}
+  .check-list input{width:17px;height:17px;accent-color:var(--vert)}
+
+  /* ---------- Toast ---------- */
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(12px);background:var(--navy-deep);color:#fff;border-radius:12px;padding:12px 18px;font-size:14px;display:flex;align-items:center;gap:14px;box-shadow:0 10px 30px rgba(12,24,50,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100vw - 28px)}
+  .toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+  .toast button{color:var(--gold);font-weight:700;text-decoration:underline;white-space:nowrap}
+
+  /* ---------- Rapport ---------- */
+  .rapport-sheet{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px 38px;max-width:860px;margin:0 auto}
+  @media(max-width:640px){.rapport-sheet{padding:22px 18px}}
+  .rap-head{display:flex;align-items:center;gap:16px;border-bottom:3px solid var(--gold);padding-bottom:16px;margin-bottom:20px}
+  .rap-head .mark{width:52px;height:52px;flex:none}
+  .rap-head h2{font-size:19px;color:var(--navy)}
+  .rap-head .sub{color:var(--body);font-size:13.5px}
+  .rap-sec{margin-bottom:22px}
+  .rap-sec h3{font-size:13px;text-transform:uppercase;letter-spacing:.9px;color:var(--gold-ink);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:10px}
+  .rap-table td,.rap-table th{padding:7px 10px;font-size:13.5px;white-space:normal}
+  .rap-kv{width:100%;font-size:14px}
+  .rap-kv td{padding:6px 0;border-bottom:1px dashed var(--line)}
+  .rap-kv td:last-child{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+  .rap-kv tr.total td{font-weight:700;border-bottom:none;border-top:2px solid var(--navy);color:var(--navy);font-size:15px}
+  .signatures{display:flex;gap:40px;margin-top:38px}
+  .signatures div{flex:1;text-align:center;font-size:13.5px;color:var(--body)}
+  .signatures .line{border-top:1px solid var(--ink);margin-top:52px;padding-top:6px}
+  .pill-list{display:flex;flex-wrap:wrap;gap:6px}
+  .pill-list .badge{font-weight:500}
+
+  @media print{
+    body{background:#fff}
+    .topbar,.tabs,.no-print,.toast,.modal-backdrop{display:none!important}
+    .view{max-width:none;padding:0}
+    .rapport-sheet{border:none;box-shadow:none;border-radius:0;padding:0;max-width:none}
+    .rap-sec{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="mark" id="logoTop" aria-hidden="true"></span>
+  <h1>Trésorerie ASGB <span>Alliance Solidarité des Guinéens de Besançon</span></h1>
+  <span class="sync-pill" id="syncPill" hidden role="status"><i aria-hidden="true"></i><b>Synchronisé</b></span>
+  <div class="balance-pill"><span class="l">Solde de caisse</span><span class="v" id="pillSolde">—</span></div>
+</header>
+
+<nav class="tabs" id="tabs" aria-label="Sections"></nav>
+
+<main class="view" id="view"></main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="modalRoot"></div>
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+
+<noscript><p style="padding:30px;text-align:center">Cet outil nécessite JavaScript. Merci de l'activer dans votre navigateur.</p></noscript>
+
+<script>
+'use strict';
+/* =====================================================================
+   Trésorerie ASGB — outil autonome du trésorier
+   Données stockées localement dans ce navigateur (localStorage).
+   Pensez à exporter une sauvegarde JSON régulièrement (onglet Sauvegarde).
+   ===================================================================== */
+
+/* ---------- Constantes & helpers ---------- */
+const KEY = 'asgb-tresorerie-v1';
+const MOIS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const MOIS_AB = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+const MODES = ['Espèces','Virement','Chèque','Autre'];
+const CAT_REC = ['Don','Événement','Subvention','Collecte solidarité','Autre recette'];
+const CAT_DEP = ['Solidarité / entraide','Événement','Fonctionnement','Solidarité internationale','Autre dépense'];
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = n => (Number(n)||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR'});
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2,10));
+const todayISO = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const frDate = iso => { if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
+const norm = s => String(s??'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const deMois = i => (/^[AEIOUÉ]/.test(MOIS[i]) ? "d'" : "de ") + MOIS[i];
+const num = v => { const n = Number(String(v).replace(/\s/g,'').replace(',','.')); return isFinite(n) ? n : 0; };
+const NOW = new Date();
+const CUR_Y = NOW.getFullYear(), CUR_M = NOW.getMonth();
+
+/* ---------- Icônes (SVG inline, style Lucide) ---------- */
+const IC = {
+  gauge:'M12 3a9 9 0 1 0 9 9M12 3v4M21 12h-4M12 12l4-6',
+  users:'M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  calcheck:'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4',
+  book:'M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z',
+  file:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8',
+  db:'M12 8c4.97 0 9-1.34 9-3s-4.03-3-9-3-9 1.34-9 3 4.03 3 9 3zM21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5',
+  plus:'M12 5v14M5 12h14',
+  pencil:'M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z',
+  trash:'M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6',
+  check:'M20 6L9 17l-5-5',
+  x:'M18 6L6 18M6 6l12 12',
+  chevL:'M15 18l-6-6 6-6',
+  chevR:'M9 18l6-6-6-6',
+  down:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3',
+  up:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12',
+  printer:'M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z',
+  wallet:'M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5M18 12a2 2 0 0 0 0 4h4v-4z',
+  alert:'M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01',
+  search:'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35',
+  euro:'M14.5 4.5a7 7 0 0 0-7 7 7 7 0 0 0 7 7c1.5 0 2.9-.47 4-1.27M4 10h9M4 14h9',
+  spark:'M22 12h-4l-3 9L9 3l-3 9H2',
+  table:'M3 3h18v18H3zM3 9h18M3 15h18M9 3v18',
+  chart:'M3 3v18h18M18 17V9M13 17V5M8 17v-3',
+  checkAll:'M18 6L7 17l-4-4M22 10l-8 8-2-2'
+};
+const icon = (n,cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${IC[n]}"/></svg>`;
+
+const LOGO = `<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="#157A38"><ellipse cx="120" cy="26" rx="10" ry="17"/><ellipse cx="88" cy="36" rx="9" ry="15" transform="rotate(-35 88 36)"/><ellipse cx="152" cy="36" rx="9" ry="15" transform="rotate(35 152 36)"/><ellipse cx="62" cy="58" rx="9" ry="14" transform="rotate(-65 62 58)"/><ellipse cx="178" cy="58" rx="9" ry="14" transform="rotate(65 178 58)"/></g><g fill="#2E9E4F"><ellipse cx="103" cy="48" rx="8" ry="13" transform="rotate(-20 103 48)"/><ellipse cx="137" cy="48" rx="8" ry="13" transform="rotate(20 137 48)"/></g><circle cx="120" cy="82" r="13" fill="#1F8A45"/><path d="M113 96 C112 124 110 156 106 194 L134 194 C130 156 128 124 127 96 Z" fill="#1F8A45"/><path d="M114 104 C96 98 84 86 80 72" stroke="#1F8A45" stroke-width="11" stroke-linecap="round" fill="none"/><path d="M126 104 C144 98 156 86 160 72" stroke="#1F8A45" stroke-width="11" stroke-linecap="round" fill="none"/><circle cx="55" cy="124" r="10.5" fill="#C31B2B"/><path d="M55 138 C50 156 48 172 46 190 L68 186 C63 168 61 154 61 140 Z" fill="#C31B2B"/><path d="M50 140 C41 132 35 122 33 111" stroke="#C31B2B" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M61 140 C69 133 74 124 76 114" stroke="#C31B2B" stroke-width="8" stroke-linecap="round" fill="none"/><circle cx="185" cy="124" r="10.5" fill="#E9A825"/><path d="M185 138 C190 156 192 172 194 190 L172 186 C177 168 179 154 179 140 Z" fill="#E9A825"/><path d="M190 140 C199 132 205 122 207 111" stroke="#E9A825" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M179 140 C171 133 166 124 164 114" stroke="#E9A825" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M28 202 Q60 190 96 200" stroke="#C31B2B" stroke-width="12" stroke-linecap="round" fill="none"/><path d="M52 212 Q120 194 188 212" stroke="#1F8A45" stroke-width="13" stroke-linecap="round" fill="none"/><path d="M144 200 Q180 190 212 202" stroke="#E9A825" stroke-width="12" stroke-linecap="round" fill="none"/></svg>`;
+
+/* ---------- Store ---------- */
+function defaultDb(){
+  return {
+    version: 1,
+    updatedAt: null,
+    lastExport: null,
+    settings: { cotisationDefaut: 10, soldeInitial: 0, exerciceDebut: CUR_Y + '-01' },
+    membres: [],     // {id, nom, prenom, tel, adhesion:'YYYY-MM', statut, cotisation, note, prelevement, autoDepuis}
+    paiements: [],   // {id, membreId, annee, mois(0-11), montant, date:'YYYY-MM-DD', mode}
+    operations: [],  // {id, date, sens:'recette'|'depense', categorie, libelle, montant, mode, note}
+    autoStop: {}     // clés "membreId|annee|mois" : paiement auto supprimé à la main, à ne jamais recréer
+  };
+}
+const MOIS_RE = /^\d{4}-(0[1-9]|1[0-2])$/, DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const idSain = v => String(v ?? '').replace(/[^\w-]/g, '').slice(0, 64);
+function normaliser(d){
+  // blinde les données quelle que soit leur provenance (ancienne version, import, saisie hors format)
+  d.settings = Object.assign({}, defaultDb().settings, (d.settings && typeof d.settings==='object') ? d.settings : {});
+  d.settings.cotisationDefaut = num(d.settings.cotisationDefaut);
+  d.settings.soldeInitial = num(d.settings.soldeInitial);
+  d.membres = (Array.isArray(d.membres) ? d.membres : []).filter(m => m && m.id != null && m.nom != null).map(m => ({
+    id: idSain(m.id), nom: String(m.nom), prenom: String(m.prenom || ''), tel: String(m.tel || ''),
+    adhesion: MOIS_RE.test(m.adhesion || '') ? m.adhesion : null,
+    statut: m.statut === 'inactif' ? 'inactif' : 'actif',
+    cotisation: num(m.cotisation), note: String(m.note || ''),
+    prelevement: !!m.prelevement,
+    autoDepuis: MOIS_RE.test(m.autoDepuis || '') ? m.autoDepuis : null
+  }));
+  const idsMembres = new Set(d.membres.map(m => m.id));
+  d.paiements = (Array.isArray(d.paiements) ? d.paiements : [])
+    .filter(p => p && p.id != null && idsMembres.has(idSain(p.membreId)) && isFinite(+p.annee) && +p.mois >= 0 && +p.mois <= 11)
+    .map(p => ({ id: idSain(p.id), membreId: idSain(p.membreId), annee: +p.annee, mois: +p.mois,
+      montant: num(p.montant), date: DATE_RE.test(p.date || '') ? p.date : todayISO(), mode: String(p.mode || 'Espèces') }));
+  d.operations = (Array.isArray(d.operations) ? d.operations : [])
+    .filter(o => o && o.id != null && (o.sens === 'recette' || o.sens === 'depense'))
+    .map(o => ({ id: idSain(o.id), date: DATE_RE.test(o.date || '') ? o.date : todayISO(), sens: o.sens,
+      categorie: String(o.categorie || ''), libelle: String(o.libelle || ''), montant: num(o.montant),
+      mode: String(o.mode || ''), note: String(o.note || '') }));
+  d.autoStop = (d.autoStop && typeof d.autoStop === 'object' && !Array.isArray(d.autoStop)) ? d.autoStop : {};
+  d.rev = Math.max(0, Math.floor(Number(d.rev) || 0));
+  return d;
+}
+let db;
+try {
+  db = JSON.parse(localStorage.getItem(KEY)) || defaultDb();
+  if(!db.membres || !db.settings) db = defaultDb();
+  normaliser(db);
+} catch(e){ db = defaultDb(); }
+
+function commit(){
+  db.rev = (db.rev || 0) + 1;
+  db.updatedAt = new Date().toISOString();
+  try { localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch(e){ alert("Impossible d'enregistrer (stockage plein ou bloqué). Exportez une sauvegarde JSON."); }
+  syncPushSoon(); // envoi automatique vers la base partagée si la synchronisation est activée
+  render();
+}
+
+/* ---------- État d'interface ---------- */
+const ui = {
+  tab: 'dash',
+  annee: CUR_Y,
+  qMembres: '', fStatut: 'tous',
+  qCot: '',
+  fSens: 'tous', qJournal: '',
+  rapMois: CUR_M, rapAnnee: CUR_Y,
+  chartTable: false
+};
+
+/* ---------- Calculs dérivés ---------- */
+const payKey = (mid,a,m) => mid+'|'+a+'|'+m;
+function payMap(){ const map=new Map(); for(const p of db.paiements) map.set(payKey(p.membreId,p.annee,p.mois), p); return map; }
+
+function estDu(m, annee, mois){
+  if(m.statut !== 'actif') return false;
+  if(!m.adhesion) return true;
+  const [ay,am] = m.adhesion.split('-').map(Number);
+  return (annee*12+mois) >= (ay*12+(am-1));
+}
+const moisEcoule = (annee,mois) => (annee*12+mois) < (CUR_Y*12+CUR_M); // strictement passé
+const moisCourantOuPasse = (annee,mois) => (annee*12+mois) <= (CUR_Y*12+CUR_M);
+
+function soldeTotal(){
+  let s = num(db.settings.soldeInitial);
+  for(const p of db.paiements) s += p.montant;
+  for(const o of db.operations) s += (o.sens==='recette'? o.montant : -o.montant);
+  return s;
+}
+
+function statsAnnee(Y){
+  const pm = payMap();
+  let attendus=0, payes=0, mtAttendu=0, mtPaye=0;
+  const retards = []; // {membre, moisManquants:[], total}
+  // l'argent réellement encaissé reste compté même si le membre est devenu inactif depuis
+  for(const p of db.paiements) if(p.annee===Y && moisCourantOuPasse(Y,p.mois)) mtPaye += p.montant;
+  for(const m of db.membres){
+    let manq=[], tot=0;
+    for(let mo=0; mo<12; mo++){
+      if(!estDu(m,Y,mo)) continue;
+      const p = pm.get(payKey(m.id,Y,mo));
+      if(moisCourantOuPasse(Y,mo)){ attendus++; mtAttendu += num(m.cotisation); }
+      if(p){ if(moisCourantOuPasse(Y,mo)) payes++; }
+      else if(moisEcoule(Y,mo)){ manq.push(mo); tot += num(m.cotisation); }
+    }
+    if(manq.length) retards.push({membre:m, mois:manq, total:tot});
+  }
+  retards.sort((a,b)=> b.total-a.total || b.mois.length-a.mois.length);
+  return {attendus, payes, mtAttendu, mtPaye, retards};
+}
+
+function moisStats(Y,M){
+  const pm = payMap();
+  let dus=0, payes=0, mt=0; const nonPayes=[];
+  for(const p of db.paiements) if(p.annee===Y && p.mois===M) mt += p.montant; // y compris membres devenus inactifs
+  for(const m of db.membres){
+    if(!estDu(m,Y,M)) continue;
+    dus++;
+    if(pm.get(payKey(m.id,Y,M))) payes++; else nonPayes.push(m);
+  }
+  return {dus, payes, mt, nonPayes};
+}
+
+function moisImpayes(Y, mois){ // membres actifs dus et non payés pour ce mois
+  const pm = payMap();
+  return membresTries().filter(m => estDu(m,Y,mois) && !pm.get(payKey(m.id,Y,mois)));
+}
+function encaisserMois(Y, mois){ // encaisse en un clic tous les impayés du mois (passé, courant ou à venir)
+  let list = moisImpayes(Y, mois);
+  // respecte le filtre de recherche actif dans la grille : on n'encaisse que ce qui est affiché
+  if(ui.tab==='cot' && ui.qCot.trim()){
+    const q = norm(ui.qCot);
+    list = list.filter(m => norm(nomComplet(m)).includes(q));
+  }
+  if(!list.length){ toast(`Tout le monde est déjà à jour pour ${MOIS[mois]} ${Y}.`); return; }
+  const created = []; let total = 0;
+  for(const m of list){
+    const rec = {id:uid(), membreId:m.id, annee:Y, mois, montant:num(m.cotisation), date:todayISO(), mode:'Espèces'};
+    db.paiements.push(rec); created.push(rec); total += rec.montant;
+  }
+  commit();
+  toast(`${created.length} cotisation${created.length>1?'s':''} encaissée${created.length>1?'s':''} pour ${MOIS[mois]} ${Y} — ${eur(total)}.`, {
+    undoLabel:'Annuler',
+    undo(){
+      const s = new Set(created.map(r=>r.id));
+      db.paiements = db.paiements.filter(p=>!s.has(p.id));
+      for(const r of created){ // pas de résurrection auto — seulement pour les membres en virement permanent
+        const mb = db.membres.find(x=>x.id===r.membreId);
+        if(mb && mb.prelevement) db.autoStop[payKey(r.membreId,r.annee,r.mois)] = true;
+      }
+      commit();
+    }
+  });
+}
+function autoManquants(){ // paiements à créer pour les membres en virement permanent
+  const pm = payMap(), out = [];
+  const cur = CUR_Y*12 + CUR_M;
+  for(const m of db.membres){
+    if(m.statut!=='actif' || !m.prelevement || !m.autoDepuis) continue;
+    const [dy,dm] = m.autoDepuis.split('-').map(Number);
+    let start = dy*12 + (dm-1);
+    if(m.adhesion){ const [ay,am] = m.adhesion.split('-').map(Number); start = Math.max(start, ay*12+(am-1)); }
+    for(let idx=start; idx<=cur; idx++){
+      const Y = Math.floor(idx/12), mo = idx%12;
+      if(pm.get(payKey(m.id,Y,mo))) continue;
+      if(db.autoStop[payKey(m.id,Y,mo)]) continue; // supprimé à la main : on ne recrée pas
+      out.push({id:uid(), membreId:m.id, annee:Y, mois:mo, montant:num(m.cotisation),
+        date: idx===cur ? todayISO() : Y+'-'+String(mo+1).padStart(2,'0')+'-01', mode:'Virement'});
+    }
+  }
+  return out;
+}
+function autoEncaisse(){ // enregistre les cotisations automatiques manquantes ; retourne les paiements créés
+  const list = autoManquants();
+  if(list.length) db.paiements.push(...list);
+  return list;
+}
+function undoAuto(list){ // annule des paiements automatiques sans qu'ils soient recréés
+  const s = new Set(list.map(r=>r.id));
+  db.paiements = db.paiements.filter(p=>!s.has(p.id));
+  for(const r of list) db.autoStop[payKey(r.membreId,r.annee,r.mois)] = true;
+  commit();
+}
+
+function seriesAnnee(Y){ // vue "caisse" : par date d'encaissement
+  const cot=Array(12).fill(0), rec=Array(12).fill(0), dep=Array(12).fill(0);
+  const pref = Y+'-';
+  for(const p of db.paiements) if(p.date && p.date.startsWith(pref)) cot[+p.date.slice(5,7)-1] += p.montant;
+  for(const o of db.operations) if(o.date && o.date.startsWith(pref)){
+    const mo = +o.date.slice(5,7)-1;
+    if(o.sens==='recette') rec[mo]+=o.montant; else dep[mo]+=o.montant;
+  }
+  return {cot, rec, dep};
+}
+
+function fluxAvant(iso){ // solde à la veille de `iso` (YYYY-MM-DD)
+  let s = num(db.settings.soldeInitial);
+  for(const p of db.paiements) if(p.date && p.date < iso) s += p.montant;
+  for(const o of db.operations) if(o.date && o.date < iso) s += (o.sens==='recette'? o.montant : -o.montant);
+  return s;
+}
+
+const membresTries = () => [...db.membres].sort((a,b)=> norm(a.nom+a.prenom).localeCompare(norm(b.nom+b.prenom)));
+const nomComplet = m => (m.prenom? m.prenom+' ' : '') + m.nom;
+
+/* ---------- Rendu ---------- */
+const TABS = [
+  {id:'dash',   ic:'gauge',    label:'Tableau de bord'},
+  {id:'membres',ic:'users',    label:'Membres'},
+  {id:'cot',    ic:'calcheck', label:'Cotisations'},
+  {id:'journal',ic:'book',     label:'Journal'},
+  {id:'rapport',ic:'file',     label:'Rapport AG'},
+  {id:'save',   ic:'db',       label:'Sauvegarde'}
+];
+
+function render(){
+  // conserver le défilement des grands tableaux
+  const sc = document.querySelector('.cot-scroll');
+  const scPos = sc ? {l:sc.scrollLeft, t:sc.scrollTop} : null;
+
+  document.getElementById('pillSolde').textContent = eur(soldeTotal());
+  document.getElementById('tabs').innerHTML = TABS.map(t =>
+    `<button class="tab ${ui.tab===t.id?'active':''}" data-act="tab" data-tab="${t.id}" ${ui.tab===t.id?'aria-current="page"':''}>${icon(t.ic)}${t.label}</button>`
+  ).join('');
+
+  const v = document.getElementById('view');
+  switch(ui.tab){
+    case 'dash':    v.innerHTML = vDash(); bindDash(); break;
+    case 'membres': v.innerHTML = vMembres(); break;
+    case 'cot':     v.innerHTML = vCot(); break;
+    case 'journal': v.innerHTML = vJournal(); break;
+    case 'rapport': v.innerHTML = vRapport(); break;
+    case 'save':    v.innerHTML = vSave(); break;
+  }
+  if(scPos){ const s2=document.querySelector('.cot-scroll'); if(s2){ s2.scrollLeft=scPos.l; s2.scrollTop=scPos.t; } }
+}
+
+const yearNav = act => `
+  <div class="year-nav" role="group" aria-label="Choix de l'année">
+    <button data-act="${act}" data-d="-1" aria-label="Année précédente">${icon('chevL')}</button>
+    <span class="yv">${ui.annee}</span>
+    <button data-act="${act}" data-d="1" aria-label="Année suivante">${icon('chevR')}</button>
+  </div>`;
+
+/* ===================== Tableau de bord ===================== */
+function vDash(){
+  const Y = ui.annee;
+  const st = statsAnnee(Y);
+  const actifs = db.membres.filter(m=>m.statut==='actif').length;
+  const solde = soldeTotal();
+  const taux = st.attendus ? Math.round(100*st.payes/st.attendus) : 0;
+  const impaye = st.retards.reduce((s,r)=>s+r.total,0);
+  const nbMoisImp = st.retards.reduce((s,r)=>s+r.mois.length,0);
+  const refMois = (Y===CUR_Y) ? CUR_M : 11;
+  const ms = moisStats(Y, refMois);
+
+  let welcome = '';
+  if(!db.membres.length){
+    welcome = `
+    <section class="card welcome">
+      <h2>Bienvenue dans l'outil de trésorerie de l'ASGB</h2>
+      <p>Toutes les données restent enregistrées <strong>dans ce navigateur</strong>, sur cet ordinateur. Pour démarrer :</p>
+      <ol>
+        <li>Réglez le <strong>solde initial</strong> de la caisse (onglet Sauvegarde) ;</li>
+        <li>Ajoutez les <strong>membres</strong> de l'association ;</li>
+        <li>Pointez les <strong>cotisations</strong> chaque mois (10 € par défaut) et tenez le <strong>journal</strong> des recettes et dépenses.</li>
+      </ol>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-gold" data-act="member-new">${icon('plus')} Ajouter un membre</button>
+        <button class="btn btn-ghost" data-act="tab" data-tab="save">Régler le solde initial</button>
+      </div>
+    </section>`;
+  }
+
+  let backupBanner = '';
+  if(db.membres.length && db.updatedAt){
+    const last = db.lastExport ? new Date(db.lastExport) : null;
+    const days = last ? Math.floor((NOW - last)/86400000) : Infinity;
+    if(days > 30){
+      backupBanner = `<div class="card" style="border-left:4px solid var(--jaune);display:flex;gap:12px;align-items:center;padding:14px 18px">
+        <span style="color:var(--gold-ink)">${icon('alert')}</span>
+        <div style="flex:1;font-size:14px">${last? 'Dernière sauvegarde exportée il y a '+days+' jours.' : 'Aucune sauvegarde exportée pour l’instant.'} Les données ne vivent que dans ce navigateur.</div>
+        <button class="btn btn-sm btn-ghost no-print" data-act="export-json">${icon('down')} Exporter</button>
+      </div>`;
+    }
+  }
+
+  const s = seriesAnnee(Y);
+  const hasData = s.cot.some(v=>v) || s.rec.some(v=>v) || s.dep.some(v=>v);
+
+  const lateHtml = st.retards.length ? st.retards.slice(0,7).map(r=>`
+      <div class="late-item">
+        <div class="who"><b>${esc(nomComplet(r.membre))}</b><small>${r.mois.length} mois : ${r.mois.map(i=>MOIS_AB[i]).join(', ')}</small></div>
+        <span class="amt">${eur(r.total)}</span>
+        <button class="btn btn-sm btn-ghost" data-act="goto-cot" data-q="${esc(r.membre.nom)}">Pointer</button>
+      </div>`).join('')
+    : `<div class="empty" style="padding:22px">${icon('check')}<p style="margin:0">Aucun retard de cotisation sur ${Y}. Bravo !</p></div>`;
+
+  const impCur = (Y===CUR_Y) ? moisImpayes(CUR_Y, CUR_M).length : 0;
+
+  return `
+    ${welcome}
+    ${backupBanner}
+    <div class="toolbar">
+      ${yearNav('year')}
+      <span class="muted">${actifs} membre${actifs>1?'s':''} actif${actifs>1?'s':''} · cotisation ${eur(db.settings.cotisationDefaut)}/mois</span>
+      <span class="spacer" style="flex:1"></span>
+      ${impCur ? `<button class="btn btn-gold" data-act="mois-all" data-annee="${CUR_Y}" data-mois="${CUR_M}">${icon('checkAll')} Encaisser ${MOIS[CUR_M]} en 1 clic (${impCur})</button>` : ''}
+    </div>
+
+    <div class="grid-kpi">
+      <div class="kpi t-gold">
+        <span class="k-label">${icon('wallet')} Solde de caisse</span>
+        <span class="k-value">${eur(solde)}</span>
+        <span class="k-sub">au ${frDate(todayISO())}</span>
+      </div>
+      <div class="kpi t-green">
+        <span class="k-label">${icon('euro')} Cotisations ${Y}</span>
+        <span class="k-value">${eur(st.mtPaye)}</span>
+        <span class="k-sub">sur ${eur(st.mtAttendu)} attendus à ce jour</span>
+      </div>
+      <div class="kpi">
+        <span class="k-label">${icon('spark')} Recouvrement ${Y}</span>
+        <span class="k-value">${taux} %</span>
+        <span class="k-sub">${MOIS[refMois]} : ${ms.payes}/${ms.dus} membres à jour</span>
+        <div class="bar" role="img" aria-label="Taux de recouvrement ${taux}%"><i style="width:${taux}%"></i></div>
+      </div>
+      <div class="kpi ${impaye>0?'t-red':'t-green'}">
+        <span class="k-label">${icon('alert')} Impayés ${Y}</span>
+        <span class="k-value">${eur(impaye)}</span>
+        <span class="k-sub">${nbMoisImp} mois de cotisation en retard</span>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <section class="card">
+        <div class="card-h">
+          <h2>Mouvements de caisse ${Y}</h2>
+          <span class="spacer"></span>
+          <button class="btn btn-sm btn-ghost" data-act="chart-toggle">${ui.chartTable? icon('chart')+' Graphique' : icon('table')+' Tableau'}</button>
+        </div>
+        ${hasData ? (ui.chartTable ? chartTableHtml(Y,s) : chartHtml(Y,s)) :
+          `<div class="empty">${icon('chart')}<p>Aucun mouvement enregistré pour ${Y}.</p><button class="btn btn-sm btn-ghost" data-act="tab" data-tab="cot">Pointer des cotisations</button></div>`}
+      </section>
+
+      <section class="card">
+        <div class="card-h"><h2>Cotisations en retard</h2><span class="spacer"></span>
+          ${st.retards.length>7? `<span class="muted">${st.retards.length} membres</span>`:''}
+        </div>
+        ${lateHtml}
+      </section>
+    </div>`;
+}
+
+/* ---- Graphique barres groupées (SVG) ---- */
+function niceCeil(v){
+  if(v<=0) return 100;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  for(const m of [1,1.5,2,2.5,3,4,5,6,8,10]) if(m*p >= v) return m*p;
+  return 10*p;
+}
+function chartHtml(Y,s){
+  const W=760,H=270, padL=54,padR=8,padT=12,padB=28;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const recT = s.cot.map((v,i)=>v+s.rec[i]);
+  const max = niceCeil(Math.max(...recT, ...s.dep, 1));
+  const y = v => padT + plotH*(1-v/max);
+  const mw = plotW/12;
+  const bw = Math.min(15, (mw-16)/2);
+  const fmtAx = v => v>=1000 ? (v/1000).toLocaleString('fr-FR')+' k€' : v+' €';
+
+  let grid='', bars='', hits='', labels='';
+  for(let g=0; g<=4; g++){
+    const val = max*g/4, gy = y(val);
+    grid += `<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" stroke="var(--line)" stroke-width="1"/>
+             <text x="${padL-8}" y="${gy+4}" text-anchor="end">${fmtAx(val)}</text>`;
+  }
+  const barPath = (x,v,w) => {
+    if(v<=0) return '';
+    const top=y(v), h=padT+plotH-top, r=Math.min(4,h,w/2);
+    return `M${x},${padT+plotH} L${x},${top+r} Q${x},${top} ${x+r},${top} L${x+w-r},${top} Q${x+w},${top} ${x+w},${top+r} L${x+w},${padT+plotH} Z`;
+  };
+  for(let i=0;i<12;i++){
+    const cx = padL + mw*i + mw/2;
+    const x1 = cx - bw - 1, x2 = cx + 1;
+    bars += `<path d="${barPath(x1,recT[i],bw)}" fill="var(--chart-rec)"/>`;
+    bars += `<path d="${barPath(x2,s.dep[i],bw)}" fill="var(--chart-dep)"/>`;
+    labels += `<text x="${cx}" y="${H-8}" text-anchor="middle">${MOIS_AB[i]}</text>`;
+    const lbl = `${MOIS[i]} ${Y} — recettes ${eur(recT[i])}, dépenses ${eur(s.dep[i])}`;
+    hits += `<rect class="hit" x="${padL+mw*i}" y="${padT}" width="${mw}" height="${plotH}" tabindex="0" role="img" aria-label="${esc(lbl)}" data-chart-m="${i}"/>
+             <rect class="hl" x="${padL+mw*i+1}" y="${padT}" width="${mw-2}" height="${plotH}" rx="6"/>`;
+  }
+  return `
+    <div class="chart-legend">
+      <span><i style="background:var(--chart-rec)"></i>Recettes (cotisations + autres)</span>
+      <span><i style="background:var(--chart-dep)"></i>Dépenses</span>
+    </div>
+    <div class="chart-wrap" id="chartWrap">
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Recettes et dépenses par mois, ${Y}">
+        ${grid}
+        <line x1="${padL}" y1="${padT+plotH}" x2="${W-padR}" y2="${padT+plotH}" stroke="var(--soft)" stroke-width="1"/>
+        ${bars}${labels}
+        <g>${hits}</g>
+      </svg>
+      <div class="chart-tip" id="chartTip"></div>
+    </div>`;
+}
+function chartTableHtml(Y,s){
+  let rows='';
+  for(let i=0;i<12;i++){
+    const rt = s.cot[i]+s.rec[i];
+    if(!rt && !s.dep[i]) continue;
+    const res = Math.round((rt - s.dep[i]) * 100) / 100;
+    rows += `<tr><td>${MOIS[i]}</td><td class="num">${eur(s.cot[i])}</td><td class="num">${eur(s.rec[i])}</td><td class="num">${eur(s.dep[i])}</td><td class="num" style="font-weight:600;color:${res>=0?'var(--ok-ink)':'var(--bad-ink)'}">${eur(res)}</td></tr>`;
+  }
+  const tc=s.cot.reduce((a,b)=>a+b,0), tr=s.rec.reduce((a,b)=>a+b,0), td=s.dep.reduce((a,b)=>a+b,0);
+  return `<div class="table-scroll"><table>
+    <thead><tr><th scope="col">Mois</th><th class="num" scope="col">Cotisations</th><th class="num" scope="col">Autres recettes</th><th class="num" scope="col">Dépenses</th><th class="num" scope="col">Résultat</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td>Total ${Y}</td><td class="num">${eur(tc)}</td><td class="num">${eur(tr)}</td><td class="num">${eur(td)}</td><td class="num">${eur(tc+tr-td)}</td></tr></tfoot>
+  </table></div>`;
+}
+function bindDash(){
+  const wrap = document.getElementById('chartWrap');
+  if(!wrap) return;
+  const tip = document.getElementById('chartTip');
+  const s = seriesAnnee(ui.annee);
+  const show = (el)=>{
+    const i = +el.dataset.chartM;
+    const rt = s.cot[i]+s.rec[i];
+    tip.innerHTML = `<b>${MOIS[i]} ${ui.annee}</b>
+      <div class="row"><span><i style="background:var(--chart-rec)"></i>Cotisations</span><span>${eur(s.cot[i])}</span></div>
+      <div class="row"><span><i style="background:var(--chart-rec);opacity:.55"></i>Autres recettes</span><span>${eur(s.rec[i])}</span></div>
+      <div class="row"><span><i style="background:var(--chart-dep)"></i>Dépenses</span><span>${eur(s.dep[i])}</span></div>
+      <div class="row" style="border-top:1px solid rgba(255,255,255,.25);margin-top:4px;padding-top:4px"><span>Résultat</span><span>${eur(rt-s.dep[i])}</span></div>`;
+    const wr = wrap.getBoundingClientRect(), er = el.getBoundingClientRect();
+    let x = er.left - wr.left + er.width/2 - 80;
+    x = Math.max(4, Math.min(x, wr.width-170));
+    tip.style.left = x+'px';
+    tip.style.top = Math.max(0, er.top-wr.top-8)+'px';
+    tip.style.opacity = 1;
+  };
+  const hide = ()=> tip.style.opacity = 0;
+  wrap.querySelectorAll('.hit').forEach(el=>{
+    el.addEventListener('mouseenter',()=>show(el));
+    el.addEventListener('mouseleave',hide);
+    el.addEventListener('focus',()=>show(el));
+    el.addEventListener('blur',hide);
+  });
+}
+
+/* ===================== Membres ===================== */
+function vMembres(){
+  const q = norm(ui.qMembres);
+  const Y = CUR_Y;
+  const st = statsAnnee(Y);
+  const lateIds = new Set(st.retards.map(r=>r.membre.id));
+  let list = membresTries().filter(m=>{
+    if(ui.fStatut!=='tous' && m.statut!==ui.fStatut) return false;
+    if(q && !norm(nomComplet(m)+' '+(m.tel||'')).includes(q)) return false;
+    return true;
+  });
+
+  const rows = list.map(m=>{
+    const aJour = m.statut!=='actif' ? '' :
+      (lateIds.has(m.id)
+        ? `<span class="badge red">${icon('x')} En retard</span>`
+        : `<span class="badge green">${icon('check')} À jour</span>`);
+    return `<tr>
+      <td><strong>${esc(nomComplet(m))}</strong>${m.note?`<br><small class="muted">${esc(m.note)}</small>`:''}</td>
+      <td>${esc(m.tel||'—')}</td>
+      <td>${m.adhesion? MOIS_AB[+m.adhesion.slice(5,7)-1]+' '+m.adhesion.slice(0,4) : '—'}</td>
+      <td class="num">${eur(m.cotisation)}</td>
+      <td>${m.statut==='actif'? '<span class="badge gold">Actif</span>':'<span class="badge gray">Inactif</span>'}${m.prelevement? ` <span class="badge green" title="Cotisation automatique (virement permanent)">${icon('check')} Auto</span>`:''}</td>
+      <td>${aJour}</td>
+      <td><button class="icon-btn" data-act="member-edit" data-id="${m.id}" aria-label="Modifier ${esc(nomComplet(m))}">${icon('pencil')}</button></td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="toolbar">
+      <div class="searchbox">${icon('search')}<input type="search" placeholder="Rechercher un membre…" value="${esc(ui.qMembres)}" data-input="qMembres" aria-label="Rechercher un membre"></div>
+      <select class="input" style="width:auto" data-input="fStatut" aria-label="Filtrer par statut">
+        <option value="tous" ${ui.fStatut==='tous'?'selected':''}>Tous les statuts</option>
+        <option value="actif" ${ui.fStatut==='actif'?'selected':''}>Actifs</option>
+        <option value="inactif" ${ui.fStatut==='inactif'?'selected':''}>Inactifs</option>
+      </select>
+      <span class="spacer" style="flex:1"></span>
+      <button class="btn btn-gold" data-act="member-new">${icon('plus')} Nouveau membre</button>
+    </div>
+    <section class="card" style="padding:0;overflow:hidden">
+      ${list.length ? `<div class="table-scroll" style="border:none;border-radius:0"><table>
+        <thead><tr><th scope="col">Membre</th><th scope="col">Téléphone</th><th scope="col">Adhésion</th><th class="num" scope="col">Cotisation/mois</th><th scope="col">Statut</th><th scope="col">Cotisations ${Y}</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody>${rows}</tbody></table></div>`
+      : `<div class="empty">${icon('users')}<p>${db.membres.length? 'Aucun membre ne correspond à la recherche.' : 'Aucun membre enregistré pour l’instant.'}</p>
+         <button class="btn btn-gold" data-act="member-new">${icon('plus')} Ajouter le premier membre</button></div>`}
+    </section>
+    <p class="muted">${db.membres.length} membre${db.membres.length>1?'s':''} au total — ${db.membres.filter(m=>m.statut==='actif').length} actif${db.membres.filter(m=>m.statut==='actif').length>1?'s':''}.</p>`;
+}
+
+/* ===================== Cotisations ===================== */
+function vCot(){
+  const Y = ui.annee;
+  const pm = payMap();
+  const q = norm(ui.qCot);
+  const list = membresTries().filter(m=> !q || norm(nomComplet(m)).includes(q));
+
+  if(!db.membres.length){
+    return `<section class="card"><div class="empty">${icon('users')}<p>Ajoutez d'abord des membres pour pointer leurs cotisations.</p>
+      <button class="btn btn-gold" data-act="member-new">${icon('plus')} Ajouter un membre</button></div></section>`;
+  }
+
+  const totMois = Array(12).fill(0);
+  const rows = list.map(m=>{
+    let paye=0, du=0, cells='';
+    for(let mo=0; mo<12; mo++){
+      const due = estDu(m,Y,mo);
+      const p = pm.get(payKey(m.id,Y,mo));
+      if(p) totMois[mo]+=p.montant;
+      if(!due && !p){ cells += `<td><span class="cell-na" title="${MOIS[mo]} : non concerné (avant l'adhésion ou membre inactif)">–</span></td>`; continue; }
+      if(due && moisCourantOuPasse(Y,mo)) du++;
+      if(p){
+        paye++;
+        cells += `<td><button class="cell paid" data-act="cell" data-id="${m.id}" data-mois="${mo}" title="Payé le ${frDate(p.date)} · ${esc(p.mode)} · ${eur(p.montant)}" aria-label="${MOIS[mo]} : payé le ${frDate(p.date)}, ${eur(p.montant)}. Modifier">${icon('check')}</button></td>`;
+      } else if(due && moisEcoule(Y,mo)){
+        cells += `<td><button class="cell late" data-act="cell" data-id="${m.id}" data-mois="${mo}" title="${MOIS[mo]} : en retard" aria-label="${MOIS[mo]} : impayé, en retard. Enregistrer un paiement">${icon('x')}</button></td>`;
+      } else {
+        cells += `<td><button class="cell due" data-act="cell" data-id="${m.id}" data-mois="${mo}" title="${MOIS[mo]} : à encaisser" aria-label="${MOIS[mo]} : non payé. Enregistrer un paiement">${icon('plus')}</button></td>`;
+      }
+    }
+    return `<tr>
+      <td class="cot-name"><strong>${esc(nomComplet(m))}</strong><span class="sub">${m.statut==='inactif'?'Inactif · ':''}${m.prelevement?'Virement auto · ':''}${eur(m.cotisation)}/mois${m.adhesion? ' · depuis '+MOIS_AB[+m.adhesion.slice(5,7)-1].toLowerCase()+' '+m.adhesion.slice(0,4) : ''}</span></td>
+      ${cells}
+      <td class="num" style="font-weight:600">${paye}${du?'/'+du:''}</td>
+    </tr>`;
+  }).join('');
+
+  const ms = moisStats(Y, (Y===CUR_Y)?CUR_M:11);
+  // boutons "tout encaisser" : tous les mois de l'année (janvier à décembre), uniquement sur les membres affichés
+  const impMois = MOIS.map((_,i)=> list.filter(m=> estDu(m,Y,i) && !pm.get(payKey(m.id,Y,i))).length);
+
+  return `
+    <div class="toolbar">
+      ${yearNav('year')}
+      <div class="searchbox">${icon('search')}<input type="search" placeholder="Filtrer les membres…" value="${esc(ui.qCot)}" data-input="qCot" aria-label="Filtrer les membres"></div>
+      <span class="spacer" style="flex:1"></span>
+      <button class="btn btn-primary" data-act="pointage">${icon('checkAll')} Pointage rapide</button>
+    </div>
+    <section class="card" style="padding:0;overflow:hidden">
+      <div class="cot-scroll">
+        <table class="cot-table">
+          <thead><tr><th scope="col">Membre</th>${MOIS_AB.map((mm,i)=>`<th scope="col" ${Y===CUR_Y&&i===CUR_M?'style="color:var(--gold-ink)"':''}>${mm}${impMois[i]? (lbl => `<button class="th-all" data-act="mois-all" data-annee="${Y}" data-mois="${i}" title="${lbl}" aria-label="${lbl}">${icon('checkAll')}</button>`)(impMois[i]>1? `Encaisser les ${impMois[i]} cotisations restantes ${deMois(i)} en un clic` : `Encaisser la cotisation restante ${deMois(i)} en un clic`):''}</th>`).join('')}<th class="num" scope="col">Payés</th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="14" style="text-align:center;color:var(--soft);padding:20px">Aucun membre ne correspond au filtre.</td></tr>`}</tbody>
+          <tfoot><tr><td>Encaissé</td>${totMois.map(t=>`<td style="font-size:12px">${t? eur(t).replace(/,00\s?€/,' €') : '·'}</td>`).join('')}<td class="num">${eur(totMois.reduce((a,b)=>a+b,0))}</td></tr></tfoot>
+        </table>
+      </div>
+    </section>
+    <div class="legend-cells" aria-hidden="true">
+      <span><span class="cell paid">${icon('check')}</span> Payé</span>
+      <span><span class="cell late">${icon('x')}</span> En retard</span>
+      <span><span class="cell due">${icon('plus')}</span> À encaisser</span>
+      <span><span class="cell-na">–</span> Non concerné (avant adhésion / inactif)</span>
+    </div>
+    <p class="muted" style="margin-top:8px">Un clic sur une case = payé aujourd'hui en espèces (annulable) ; un clic sur une case verte = modifier ou annuler. Le petit bouton vert en tête de colonne encaisse <strong>tout le mois en un clic</strong>. ${MOIS[(Y===CUR_Y)?CUR_M:11]} : ${ms.payes}/${ms.dus} membres à jour.</p>`;
+}
+
+/* ===================== Journal ===================== */
+function vJournal(){
+  const Y = ui.annee;
+  const q = norm(ui.qJournal);
+  let ops = db.operations
+    .filter(o=> o.date && o.date.startsWith(Y+'-'))
+    .filter(o=> ui.fSens==='tous' || o.sens===ui.fSens)
+    .filter(o=> !q || norm(o.libelle+' '+o.categorie+' '+(o.note||'')).includes(q))
+    .sort((a,b)=> b.date.localeCompare(a.date));
+
+  const tRec = ops.filter(o=>o.sens==='recette').reduce((s,o)=>s+o.montant,0);
+  const tDep = ops.filter(o=>o.sens==='depense').reduce((s,o)=>s+o.montant,0);
+
+  const rows = ops.map(o=>`<tr>
+    <td>${frDate(o.date)}</td>
+    <td>${o.sens==='recette'? `<span class="badge green">${icon('up')} Recette</span>` : `<span class="badge gold">${icon('down')} Dépense</span>`}</td>
+    <td>${esc(o.categorie)}</td>
+    <td style="white-space:normal;min-width:160px"><strong>${esc(o.libelle)}</strong>${o.note?`<br><small class="muted">${esc(o.note)}</small>`:''}</td>
+    <td>${esc(o.mode||'—')}</td>
+    <td class="num" style="font-weight:600;color:${o.sens==='recette'?'var(--ok-ink)':'var(--gold-ink)'}">${o.sens==='recette'?'+':'−'} ${eur(o.montant)}</td>
+    <td style="white-space:nowrap">
+      <button class="icon-btn" data-act="op-edit" data-id="${o.id}" aria-label="Modifier l'opération">${icon('pencil')}</button>
+      <button class="icon-btn" data-act="op-del" data-id="${o.id}" aria-label="Supprimer l'opération">${icon('trash')}</button>
+    </td>
+  </tr>`).join('');
+
+  return `
+    <div class="toolbar">
+      ${yearNav('year')}
+      <select class="input" style="width:auto" data-input="fSens" aria-label="Filtrer par type">
+        <option value="tous" ${ui.fSens==='tous'?'selected':''}>Recettes + dépenses</option>
+        <option value="recette" ${ui.fSens==='recette'?'selected':''}>Recettes</option>
+        <option value="depense" ${ui.fSens==='depense'?'selected':''}>Dépenses</option>
+      </select>
+      <div class="searchbox">${icon('search')}<input type="search" placeholder="Rechercher…" value="${esc(ui.qJournal)}" data-input="qJournal" aria-label="Rechercher une opération"></div>
+      <span class="spacer" style="flex:1"></span>
+      <button class="btn btn-gold" data-act="op-new">${icon('plus')} Nouvelle opération</button>
+    </div>
+    <section class="card" style="padding:0;overflow:hidden">
+      ${ops.length ? `<div class="table-scroll" style="border:none;border-radius:0"><table>
+        <thead><tr><th scope="col">Date</th><th scope="col">Type</th><th scope="col">Catégorie</th><th scope="col">Libellé</th><th scope="col">Mode</th><th class="num" scope="col">Montant</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td colspan="5">Total ${Y}${ui.fSens!=='tous'||q?' (filtré)':''} — recettes ${eur(tRec)}, dépenses ${eur(tDep)}</td><td class="num">${eur(tRec-tDep)}</td><td></td></tr></tfoot>
+      </table></div>`
+      : `<div class="empty">${icon('book')}<p>Aucune opération ${ui.fSens!=='tous'?'de ce type ':''}en ${Y}.<br><small class="muted">Le journal regroupe tout ce qui n'est pas une cotisation : dons, événements, dépenses de solidarité, fonctionnement…</small></p>
+        <button class="btn btn-gold" data-act="op-new">${icon('plus')} Enregistrer une opération</button></div>`}
+    </section>
+    <p class="muted">Les cotisations pointées dans l'onglet « Cotisations » sont comptées automatiquement dans la caisse — inutile de les ressaisir ici.</p>`;
+}
+
+/* ===================== Rapport AG ===================== */
+function vRapport(){
+  const Y = ui.rapAnnee, M = ui.rapMois;
+  const first = `${Y}-${String(M+1).padStart(2,'0')}-01`;
+  const nextIso = M===11 ? `${Y+1}-01-01` : `${Y}-${String(M+2).padStart(2,'0')}-01`;
+
+  const soldeDebut = fluxAvant(first);
+  const paysMois = db.paiements.filter(p=>p.date>=first && p.date<nextIso).sort((a,b)=>a.date.localeCompare(b.date));
+  const opsMois  = db.operations.filter(o=>o.date>=first && o.date<nextIso).sort((a,b)=>a.date.localeCompare(b.date));
+  const totCot = paysMois.reduce((s,p)=>s+p.montant,0);
+  const totRec = opsMois.filter(o=>o.sens==='recette').reduce((s,o)=>s+o.montant,0);
+  const totDep = opsMois.filter(o=>o.sens==='depense').reduce((s,o)=>s+o.montant,0);
+  const soldeFin = soldeDebut + totCot + totRec - totDep;
+
+  const ms = moisStats(Y,M);
+  const mById = new Map(db.membres.map(m=>[m.id,m]));
+
+  const opRows = [
+    ...paysMois.map(p=>({date:p.date, lib:`Cotisation ${MOIS[p.mois]} — ${nomComplet(mById.get(p.membreId)||{nom:'Membre supprimé'})}`, cat:'Cotisation', mode:p.mode, mt:p.montant, sens:'recette'})),
+    ...opsMois.map(o=>({date:o.date, lib:o.libelle, cat:o.categorie, mode:o.mode, mt:o.montant, sens:o.sens}))
+  ].sort((a,b)=>a.date.localeCompare(b.date));
+
+  return `
+    <div class="toolbar no-print">
+      <select class="input" style="width:auto" data-input="rapMois" aria-label="Mois du rapport">
+        ${MOIS.map((m,i)=>`<option value="${i}" ${i===M?'selected':''}>${m}</option>`).join('')}
+      </select>
+      <select class="input" style="width:auto" data-input="rapAnnee" aria-label="Année du rapport">
+        ${rangeAnnees().map(y=>`<option value="${y}" ${y===Y?'selected':''}>${y}</option>`).join('')}
+      </select>
+      <span class="spacer" style="flex:1"></span>
+      <button class="btn btn-primary" data-act="print">${icon('printer')} Imprimer / PDF</button>
+    </div>
+
+    <div class="rapport-sheet">
+      <div class="rap-head">
+        <span class="mark">${LOGO}</span>
+        <div>
+          <h2>Rapport de trésorerie — ${MOIS[M]} ${Y}</h2>
+          <div class="sub">Alliance Solidarité des Guinéens de Besançon · établi le ${frDate(todayISO())}</div>
+        </div>
+      </div>
+
+      <div class="rap-sec">
+        <h3>Synthèse du mois</h3>
+        <table class="rap-kv">
+          <tr><td>Solde en caisse au 1er ${MOIS[M].toLowerCase()} ${Y}</td><td>${eur(soldeDebut)}</td></tr>
+          <tr><td>Cotisations encaissées dans le mois (${paysMois.length} paiement${paysMois.length>1?'s':''})</td><td>+ ${eur(totCot)}</td></tr>
+          <tr><td>Autres recettes (${opsMois.filter(o=>o.sens==='recette').length})</td><td>+ ${eur(totRec)}</td></tr>
+          <tr><td>Dépenses (${opsMois.filter(o=>o.sens==='depense').length})</td><td>− ${eur(totDep)}</td></tr>
+          <tr class="total"><td>Solde en caisse au ${frDate(nextIso)==='01/01/'+(Y+1)?'31 décembre '+Y:'dernier jour du mois'}</td><td>${eur(soldeFin)}</td></tr>
+        </table>
+      </div>
+
+      <div class="rap-sec">
+        <h3>Cotisations du mois de ${MOIS[M].toLowerCase()}</h3>
+        <p style="font-size:14px;margin-bottom:8px">${ms.payes} membre${ms.payes>1?'s':''} à jour sur ${ms.dus} concerné${ms.dus>1?'s':''} (${ms.dus?Math.round(100*ms.payes/ms.dus):0} %) — ${eur(ms.mt)} perçus pour ce mois.</p>
+        ${ms.nonPayes.length? `<p style="font-size:13.5px;margin-bottom:6px;color:var(--bad-ink);font-weight:600">N'ont pas encore réglé ${MOIS[M].toLowerCase()} :</p>
+          <div class="pill-list">${ms.nonPayes.map(m=>`<span class="badge red">${esc(nomComplet(m))}</span>`).join('')}</div>`
+        : `<p style="font-size:13.5px;color:var(--ok-ink);font-weight:600">Tous les membres concernés sont à jour pour ce mois.</p>`}
+      </div>
+
+      <div class="rap-sec">
+        <h3>Détail des mouvements du mois</h3>
+        ${opRows.length ? `<div class="table-scroll" style="box-shadow:none"><table class="rap-table">
+          <thead><tr><th scope="col">Date</th><th scope="col">Libellé</th><th scope="col">Catégorie</th><th scope="col">Mode</th><th class="num" scope="col">Montant</th></tr></thead>
+          <tbody>${opRows.map(r=>`<tr><td>${frDate(r.date)}</td><td>${esc(r.lib)}</td><td>${esc(r.cat)}</td><td>${esc(r.mode||'—')}</td><td class="num">${r.sens==='recette'?'+':'−'} ${eur(r.mt)}</td></tr>`).join('')}</tbody>
+        </table></div>` : `<p class="muted">Aucun mouvement enregistré ce mois-ci.</p>`}
+      </div>
+
+      <div class="signatures">
+        <div>Le Trésorier<div class="line">Signature</div></div>
+        <div>Le Président<div class="line">Signature</div></div>
+      </div>
+    </div>`;
+}
+function rangeAnnees(){
+  let min = CUR_Y, max = CUR_Y;
+  const vu = y => { if(isFinite(y) && y >= 2000 && y <= 2100){ if(y < min) min = y; if(y > max) max = y; } };
+  for(const p of db.paiements) vu(p.annee);
+  for(const o of db.operations) if(o.date) vu(+o.date.slice(0,4));
+  min = Math.min(min, 2023);
+  const out=[]; for(let y = Math.min(max+1, 2100); y >= min; y--) out.push(y);
+  return out;
+}
+
+/* ===================== Sauvegarde & paramètres ===================== */
+function vSave(){
+  const s = db.settings;
+  return `
+    <div class="two-col">
+      <div>
+        <section class="card">
+          <div class="card-h"><h2>Paramètres</h2></div>
+          <form id="formSettings" class="form-grid">
+            <div class="field">
+              <label for="setCot">Cotisation mensuelle par défaut <span class="req">*</span></label>
+              <input class="input" id="setCot" type="number" step="0.5" min="0" value="${s.cotisationDefaut}" required>
+              <span class="hint">Appliquée aux nouveaux membres (modifiable membre par membre).</span>
+            </div>
+            <div class="field">
+              <label for="setSolde">Solde initial de la caisse</label>
+              <input class="input" id="setSolde" type="number" step="0.01" value="${s.soldeInitial}">
+              <span class="hint">Argent déjà en caisse avant la première saisie dans l'outil.</span>
+            </div>
+            <div class="full"><button class="btn btn-primary" type="submit">${icon('check')} Enregistrer les paramètres</button></div>
+          </form>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><h2>Exports comptables (CSV pour Excel)</h2></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-ghost" data-act="csv-membres">${icon('down')} Membres</button>
+            <button class="btn btn-ghost" data-act="csv-cot">${icon('down')} Cotisations ${ui.annee}</button>
+            <button class="btn btn-ghost" data-act="csv-journal">${icon('down')} Journal complet</button>
+          </div>
+          <p class="muted" style="margin-top:10px">Fichiers CSV (séparateur point-virgule) prêts à ouvrir dans Excel ou LibreOffice.</p>
+        </section>
+      </div>
+
+      <div>
+        <section class="card" style="border-left:4px solid var(--vert)">
+          <div class="card-h"><h2>Travailler à plusieurs (synchronisation)</h2></div>
+          ${syncActif() ? `
+            <p style="font-size:14px;margin-bottom:10px">État :
+              ${sync.etat==='ok'
+                ? `<span class="badge green">${icon('check')} Synchronisé</span>`
+                : `<span class="badge gold">${icon('alert')} Hors ligne — saisies conservées sur cet appareil</span>`}
+            </p>
+            <p class="muted" style="margin-bottom:12px;word-break:break-all">Base : ${esc(sync.cfg.url)}<br>
+            Chaque modification est partagée automatiquement entre tous les appareils connectés. En cas de saisie simultanée au même instant, la dernière enregistrée l'emporte.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-gold" data-act="sync-invitation">Inviter le trésorier</button>
+              <button class="btn btn-ghost" data-act="sync-desactiver">Désactiver</button>
+            </div>`
+          : `
+            <p style="font-size:14px;margin-bottom:12px">Pour que le président et le trésorier voient les <strong>mêmes données, mises à jour automatiquement des deux côtés</strong>, reliez l'outil à une petite base en ligne gratuite (Firebase, hébergée en Europe). Une seule personne suit le guide ; l'autre n'a plus qu'à coller l'adresse et le code.</p>
+            <div class="form-grid">
+              <div class="field full"><label for="syncUrl">Adresse de la base en ligne</label>
+                <input class="input" id="syncUrl" placeholder="https://…firebasedatabase.app" value="${esc((sync.cfg&&sync.cfg.url)||'')}" autocomplete="off"></div>
+              <div class="field full"><label for="syncCode">Code d'équipe (secret)</label>
+                <div style="display:flex;gap:8px"><input class="input" id="syncCode" style="flex:1" value="${esc((sync.cfg&&sync.cfg.code)||'')}" autocomplete="off">
+                <button class="btn btn-ghost" type="button" data-act="sync-generer">Générer</button></div>
+                <span class="hint">C'est la clé d'accès aux données : ne la partagez qu'avec le bureau.</span></div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+              <button class="btn btn-ghost" data-act="sync-guide">Guide pas à pas (5 min)</button>
+              <button class="btn btn-primary" data-act="sync-activer">${icon('check')} Activer la synchronisation</button>
+            </div>`}
+        </section>
+
+        <section class="card" style="border-left:4px solid var(--gold)">
+          <div class="card-h"><h2>Sauvegarde des données</h2></div>
+          <p style="font-size:14px;margin-bottom:12px">Les données vivent <strong>uniquement dans ce navigateur</strong>. Exportez une sauvegarde <strong>après chaque assemblée générale</strong> et conservez-la (clé USB, e-mail du bureau…).</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+            <button class="btn btn-gold" data-act="export-json">${icon('down')} Exporter la sauvegarde (JSON)</button>
+            <button class="btn btn-ghost" data-act="import-json">${icon('up')} Restaurer une sauvegarde</button>
+          </div>
+          <p class="muted">${db.lastExport? 'Dernier export : '+frDate(db.lastExport.slice(0,10)) : 'Aucun export effectué pour l’instant.'}${db.updatedAt? ' · Dernière modification : '+frDate(db.updatedAt.slice(0,10)) : ''}</p>
+        </section>
+
+        <section class="card">
+          <div class="card-h"><h2>Contenu actuel</h2></div>
+          <table class="rap-kv">
+            <tr><td>Membres</td><td>${db.membres.length}</td></tr>
+            <tr><td>Paiements de cotisation</td><td>${db.paiements.length}</td></tr>
+            <tr><td>Opérations au journal</td><td>${db.operations.length}</td></tr>
+            <tr class="total"><td>Solde de caisse</td><td>${eur(soldeTotal())}</td></tr>
+          </table>
+        </section>
+
+        <section class="card" style="border-left:4px solid var(--rouge)">
+          <div class="card-h"><h2>Zone dangereuse</h2></div>
+          <button class="btn btn-danger-ghost" data-act="reset-all">${icon('trash')} Tout effacer et repartir de zéro</button>
+        </section>
+      </div>
+    </div>`;
+}
+
+/* ===================== Modales ===================== */
+const modalRoot = document.getElementById('modalRoot');
+function openModal(html, onMount){
+  modalRoot.innerHTML = `<div class="modal-backdrop" data-close="1"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;
+  const bd = modalRoot.firstElementChild;
+  bd.addEventListener('mousedown', e=>{ if(e.target===bd) closeModal(); });
+  const f = bd.querySelector('.modal-b input:not([type=checkbox]), .modal-b select, .modal-b textarea') || bd.querySelector('.modal-f button');
+  if(f) f.focus();
+  if(onMount) onMount(bd);
+}
+function closeModal(){ modalRoot.innerHTML=''; }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+const modalHead = (title) => `<div class="modal-h"><h3>${title}</h3><button class="icon-btn" data-close-btn aria-label="Fermer">${icon('x')}</button></div>`;
+
+function confirmDlg({title='Confirmer', message, okLabel='Confirmer', onOk}){
+  openModal(`${modalHead(esc(title))}
+    <div class="modal-b"><p style="font-size:14.5px">${message}</p></div>
+    <div class="modal-f"><span class="spacer"></span>
+      <button class="btn btn-ghost" data-close-btn>Annuler</button>
+      <button class="btn btn-danger" id="cfOk">${esc(okLabel)}</button>
+    </div>`,
+    bd=>{ bd.querySelector('#cfOk').addEventListener('click', ()=>{ closeModal(); onOk(); }); });
+}
+
+/* ---- Fiche membre ---- */
+function memberModal(id){
+  const m = id ? db.membres.find(x=>x.id===id) : null;
+  const s = db.settings;
+  const val = (k,d='') => m ? (m[k] ?? d) : d;
+  openModal(`${modalHead(m? 'Modifier le membre' : 'Nouveau membre')}
+    <form id="fMember">
+    <div class="modal-b form-grid">
+      <div class="field"><label for="mNom">Nom <span class="req">*</span></label><input class="input" id="mNom" required value="${esc(val('nom'))}" autocomplete="off"></div>
+      <div class="field"><label for="mPrenom">Prénom</label><input class="input" id="mPrenom" value="${esc(val('prenom'))}" autocomplete="off"></div>
+      <div class="field"><label for="mTel">Téléphone</label><input class="input" id="mTel" type="tel" value="${esc(val('tel'))}" autocomplete="off"></div>
+      <div class="field full"><label for="mAdh">Membre depuis <span class="req">*</span></label>
+        <input class="input" id="mAdh" type="month" required pattern="\\d{4}-(0[1-9]|1[0-2])" placeholder="AAAA-MM" value="${esc(val('adhesion', CUR_Y+'-01'))}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <button type="button" class="btn btn-sm btn-ghost" data-adh="${CUR_Y}-01">Cotise depuis janvier ${CUR_Y}</button>
+          <button type="button" class="btn btn-sm btn-ghost" data-adh="${CUR_Y}-${String(CUR_M+1).padStart(2,'0')}">A adhéré ce mois-ci (${MOIS_AB[CUR_M].toLowerCase()} ${CUR_Y})</button>
+        </div>
+        <span class="hint">La cotisation est due à partir de ce mois. Pour quelqu'un qui rejoint l'association en cours d'année, choisissez son mois d'adhésion : les mois précédents seront marqués « – » (non concerné), sans aucun retard compté.</span></div>
+      <div class="field"><label for="mCot">Cotisation mensuelle (€) <span class="req">*</span></label><input class="input" id="mCot" type="number" step="0.5" min="0" required value="${m? m.cotisation : s.cotisationDefaut}"></div>
+      <div class="field"><label for="mStatut">Statut</label>
+        <select class="input" id="mStatut">
+          <option value="actif" ${val('statut','actif')==='actif'?'selected':''}>Actif</option>
+          <option value="inactif" ${val('statut')==='inactif'?'selected':''}>Inactif (parti / suspendu)</option>
+        </select>
+        <span class="hint">Un membre inactif n'est plus compté dans les cotisations dues.</span></div>
+      <div class="field full">
+        <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:14px;color:var(--ink)">
+          <input type="checkbox" id="mAuto" ${m&&m.prelevement?'checked':''} style="width:18px;height:18px;accent-color:var(--vert);flex:none">
+          Cotisation automatique (virement permanent)
+        </label>
+        <span class="hint">La cotisation de ce membre sera enregistrée toute seule chaque mois (mode Virement), sans pointage manuel — pour les membres qui ont mis en place un virement permanent vers le compte de l'association.</span>
+      </div>
+      <div class="field full"><label for="mNote">Note</label><input class="input" id="mNote" value="${esc(val('note'))}" autocomplete="off"></div>
+    </div>
+    <div class="modal-f">
+      ${m? `<button type="button" class="btn btn-danger-ghost" id="mDel">${icon('trash')} Supprimer</button>`:''}
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-ghost" data-close-btn>Annuler</button>
+      <button type="submit" class="btn btn-primary">${icon('check')} Enregistrer</button>
+    </div>
+    </form>`,
+    bd=>{
+      bd.querySelectorAll('[data-adh]').forEach(b=> b.addEventListener('click', ()=>{ bd.querySelector('#mAdh').value = b.dataset.adh; }));
+      bd.querySelector('#fMember').addEventListener('submit', e=>{
+        e.preventDefault();
+        const autoOn = bd.querySelector('#mAuto').checked;
+        const rec = {
+          id: m? m.id : uid(),
+          nom: bd.querySelector('#mNom').value.trim(),
+          prenom: bd.querySelector('#mPrenom').value.trim(),
+          tel: bd.querySelector('#mTel').value.trim(),
+          adhesion: bd.querySelector('#mAdh').value,
+          cotisation: num(bd.querySelector('#mCot').value),
+          statut: bd.querySelector('#mStatut').value,
+          note: bd.querySelector('#mNote').value.trim(),
+          prelevement: autoOn,
+          // le compteur "auto" ne survit que si le membre était déjà actif ET en auto ;
+          // sinon (activation, ou réactivation après inactivité) il repart du mois courant
+          autoDepuis: autoOn ? ((m && m.prelevement && m.statut==='actif' && m.autoDepuis) || CUR_Y+'-'+String(CUR_M+1).padStart(2,'0')) : null
+        };
+        if(!rec.nom){ toast('Le nom est obligatoire.'); return; }
+        if(!MOIS_RE.test(rec.adhesion)){ toast('Date d’adhésion invalide — utilisez le format AAAA-MM (ex. ' + CUR_Y + '-01).'); return; }
+        if(rec.cotisation < 0){ toast('Cotisation invalide.'); return; }
+        if(autoOn && (!m || !m.prelevement)){
+          // (ré)activation du virement permanent : on lève les anciennes exclusions de ce membre
+          for(const k of Object.keys(db.autoStop)) if(k.startsWith(rec.id + '|')) delete db.autoStop[k];
+        }
+        if(m) Object.assign(m, rec); else db.membres.push(rec);
+        const nAuto = autoEncaisse().length;
+        closeModal(); commit();
+        toast((m? 'Membre modifié.' : 'Membre ajouté : '+nomComplet(rec)) + (nAuto? ` ${nAuto} cotisation${nAuto>1?'s':''} encaissée${nAuto>1?'s':''} automatiquement.`:''));
+      });
+      const del = bd.querySelector('#mDel');
+      if(del) del.addEventListener('click', ()=>{
+        const nb = db.paiements.filter(p=>p.membreId===m.id).length;
+        confirmDlg({
+          title:'Supprimer ce membre ?',
+          message:`<strong>${esc(nomComplet(m))}</strong> sera supprimé définitivement${nb?`, ainsi que ses <strong>${nb} paiement${nb>1?'s':''}</strong> de cotisation (le solde de caisse sera recalculé)`:''}.<br><br>Pour garder l'historique, préférez le statut <strong>Inactif</strong>.`,
+          okLabel:'Supprimer définitivement',
+          onOk(){
+            hideToast();
+            db.paiements = db.paiements.filter(p=>p.membreId!==m.id);
+            db.membres = db.membres.filter(x=>x.id!==m.id);
+            commit(); toast('Membre supprimé.');
+          }
+        });
+      });
+    });
+}
+
+/* ---- Cellule cotisation ---- */
+function cellAction(id, mois){
+  const m = db.membres.find(x=>x.id===id); if(!m) return;
+  const Y = ui.annee;
+  const p = payMap().get(payKey(id,Y,mois));
+  if(!p){
+    const rec = {id:uid(), membreId:id, annee:Y, mois, montant:num(m.cotisation), date:todayISO(), mode:'Espèces'};
+    db.paiements.push(rec);
+    commit();
+    toast(`${nomComplet(m)} — ${MOIS[mois]} ${Y} : ${eur(rec.montant)} encaissés.`, {
+      undoLabel:'Annuler',
+      undo(){ db.paiements = db.paiements.filter(x=>x.id!==rec.id); commit(); }
+    });
+  } else {
+    paymentModal(p, m);
+  }
+}
+function paymentModal(p, m){
+  openModal(`${modalHead('Paiement — '+esc(nomComplet(m)))}
+    <form id="fPay">
+    <div class="modal-b">
+      <p class="muted" style="margin-bottom:12px">Cotisation de <strong>${MOIS[p.mois]} ${p.annee}</strong></p>
+      <div class="form-grid">
+        <div class="field"><label for="pDate">Date d'encaissement</label><input class="input" id="pDate" type="date" required value="${esc(p.date)}"></div>
+        <div class="field"><label for="pMode">Mode de paiement</label>
+          <select class="input" id="pMode">${MODES.map(x=>`<option ${x===p.mode?'selected':''}>${x}</option>`).join('')}</select></div>
+        <div class="field"><label for="pMt">Montant (€)</label><input class="input" id="pMt" type="number" step="0.01" min="0" required value="${p.montant}"></div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button type="button" class="btn btn-danger-ghost" id="pDel">${icon('trash')} Annuler ce paiement</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-ghost" data-close-btn>Fermer</button>
+      <button type="submit" class="btn btn-primary">${icon('check')} Enregistrer</button>
+    </div>
+    </form>`,
+    bd=>{
+      bd.querySelector('#fPay').addEventListener('submit', e=>{
+        e.preventDefault();
+        const mt = num(bd.querySelector('#pMt').value);
+        if(mt <= 0){ toast('Montant invalide : le paiement n’a pas été modifié.'); return; }
+        p.date = bd.querySelector('#pDate').value || todayISO();
+        p.mode = bd.querySelector('#pMode').value;
+        p.montant = mt;
+        closeModal(); commit(); toast('Paiement modifié.');
+      });
+      bd.querySelector('#pDel').addEventListener('click', ()=>{
+        db.paiements = db.paiements.filter(x=>x.id!==p.id);
+        if(m.prelevement) db.autoStop[payKey(p.membreId, p.annee, p.mois)] = true; // ne pas recréer via le virement permanent
+        closeModal(); commit();
+        toast(`Paiement de ${nomComplet(m)} (${MOIS[p.mois]}) annulé.`);
+      });
+    });
+}
+
+/* ---- Pointage rapide ---- */
+function pointageModal(){
+  const Y = ui.annee;
+  const defM = (Y===CUR_Y)? CUR_M : 11;
+  const build = (mois)=>{
+    const pm = payMap();
+    const list = membresTries().filter(m=> estDu(m,Y,mois) && !pm.get(payKey(m.id,Y,mois)));
+    return list;
+  };
+  const listHtml = list => list.length
+    ? list.map(m=>`<label><input type="checkbox" value="${m.id}"> <span style="flex:1">${esc(nomComplet(m))}</span> <span class="muted">${eur(m.cotisation)}</span></label>`).join('')
+    : `<p style="padding:14px;text-align:center;color:var(--body)">Tout le monde est à jour pour ce mois.</p>`;
+
+  openModal(`${modalHead('Pointage rapide — cotisations '+Y)}
+    <form id="fPoint">
+    <div class="modal-b">
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="field"><label for="ptMois">Mois</label>
+          <select class="input" id="ptMois">${MOIS.map((x,i)=>`<option value="${i}" ${i===defM?'selected':''}>${x}</option>`).join('')}</select></div>
+        <div class="field"><label for="ptDate">Date d'encaissement</label><input class="input" id="ptDate" type="date" value="${todayISO()}" required></div>
+        <div class="field"><label for="ptMode">Mode</label>
+          <select class="input" id="ptMode">${MODES.map(x=>`<option>${x}</option>`).join('')}</select></div>
+        <div class="field"><label>&nbsp;</label><button type="button" class="btn btn-ghost" id="ptAll">${icon('checkAll')} Tout cocher</button></div>
+      </div>
+      <div class="check-list" id="ptList">${listHtml(build(defM))}</div>
+      <p class="hint" style="color:var(--soft);font-size:12.5px">Cochez les membres qui viennent de payer (par exemple pendant l'assemblée générale), puis validez.</p>
+    </div>
+    <div class="modal-f"><span class="spacer"></span>
+      <button type="button" class="btn btn-ghost" data-close-btn>Annuler</button>
+      <button type="submit" class="btn btn-primary" id="ptOk">${icon('check')} Valider le pointage</button>
+    </div>
+    </form>`,
+    bd=>{
+      const sel = bd.querySelector('#ptMois'), listEl = bd.querySelector('#ptList');
+      sel.addEventListener('change', ()=> listEl.innerHTML = listHtml(build(+sel.value)));
+      bd.querySelector('#ptAll').addEventListener('click', ()=>{
+        listEl.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=true);
+      });
+      bd.querySelector('#fPoint').addEventListener('submit', e=>{
+        e.preventDefault();
+        const mois = +sel.value;
+        const date = bd.querySelector('#ptDate').value || todayISO();
+        const mode = bd.querySelector('#ptMode').value;
+        const ids = [...listEl.querySelectorAll('input:checked')].map(c=>c.value);
+        if(!ids.length){ toast('Aucun membre coché.'); return; }
+        let total=0;
+        for(const id of ids){
+          const m = db.membres.find(x=>x.id===id); if(!m) continue;
+          db.paiements.push({id:uid(), membreId:id, annee:Y, mois, montant:num(m.cotisation), date, mode});
+          total += num(m.cotisation);
+        }
+        closeModal(); commit();
+        toast(`${ids.length} paiement${ids.length>1?'s':''} enregistré${ids.length>1?'s':''} pour ${MOIS[mois]} — ${eur(total)}.`);
+      });
+    });
+}
+
+/* ---- Opération journal ---- */
+function opModal(id){
+  const o = id ? db.operations.find(x=>x.id===id) : null;
+  const sens = o? o.sens : 'recette';
+  const catOptions = s => (s==='recette'?CAT_REC:CAT_DEP).map(c=>`<option ${o&&o.categorie===c?'selected':''}>${c}</option>`).join('');
+  openModal(`${modalHead(o? 'Modifier l’opération' : 'Nouvelle opération')}
+    <form id="fOp">
+    <div class="modal-b">
+      <div class="radio-row" style="margin-bottom:14px">
+        <label class="radio-pill rec"><input type="radio" name="oSens" value="recette" ${sens==='recette'?'checked':''}>${icon('up')} Recette</label>
+        <label class="radio-pill dep"><input type="radio" name="oSens" value="depense" ${sens==='depense'?'checked':''}>${icon('down')} Dépense</label>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label for="oDate">Date <span class="req">*</span></label><input class="input" id="oDate" type="date" required value="${o? esc(o.date) : todayISO()}"></div>
+        <div class="field"><label for="oCat">Catégorie</label><select class="input" id="oCat">${catOptions(sens)}</select></div>
+        <div class="field full"><label for="oLib">Libellé <span class="req">*</span></label><input class="input" id="oLib" required value="${esc(o?o.libelle:'')}" placeholder="Ex. : soutien à une famille, location de salle…" autocomplete="off"></div>
+        <div class="field"><label for="oMt">Montant (€) <span class="req">*</span></label><input class="input" id="oMt" type="number" step="0.01" min="0.01" required value="${o?o.montant:''}"></div>
+        <div class="field"><label for="oMode">Mode</label><select class="input" id="oMode">${MODES.map(x=>`<option ${o&&o.mode===x?'selected':''}>${x}</option>`).join('')}</select></div>
+        <div class="field full"><label for="oNote">Note</label><input class="input" id="oNote" value="${esc(o?o.note:'')}" autocomplete="off"></div>
+      </div>
+    </div>
+    <div class="modal-f"><span class="spacer"></span>
+      <button type="button" class="btn btn-ghost" data-close-btn>Annuler</button>
+      <button type="submit" class="btn btn-primary">${icon('check')} Enregistrer</button>
+    </div>
+    </form>`,
+    bd=>{
+      bd.querySelectorAll('input[name=oSens]').forEach(r=> r.addEventListener('change', ()=>{
+        bd.querySelector('#oCat').innerHTML = catOptions(bd.querySelector('input[name=oSens]:checked').value);
+      }));
+      bd.querySelector('#fOp').addEventListener('submit', e=>{
+        e.preventDefault();
+        const rec = {
+          id: o? o.id : uid(),
+          date: bd.querySelector('#oDate').value,
+          sens: bd.querySelector('input[name=oSens]:checked').value,
+          categorie: bd.querySelector('#oCat').value,
+          libelle: bd.querySelector('#oLib').value.trim(),
+          montant: num(bd.querySelector('#oMt').value),
+          mode: bd.querySelector('#oMode').value,
+          note: bd.querySelector('#oNote').value.trim()
+        };
+        if(!rec.libelle){ toast('Le libellé est obligatoire.'); return; }
+        if(rec.montant <= 0){ toast('Montant invalide.'); return; }
+        if(!DATE_RE.test(rec.date) || +rec.date.slice(0,4) < 2000 || +rec.date.slice(0,4) > 2100){ toast('Date invalide — vérifiez l’année.'); return; }
+        if(o) Object.assign(o, rec); else db.operations.push(rec);
+        const y = +rec.date.slice(0,4); if(y >= 2020 && y <= 2100) ui.annee = y;
+        closeModal(); commit(); toast(o? 'Opération modifiée.' : 'Opération enregistrée.');
+      });
+    });
+}
+
+/* ===================== Toast ===================== */
+const toastEl = document.getElementById('toast');
+let toastTimer;
+function toast(msg, opts={}){
+  clearTimeout(toastTimer);
+  toastEl.innerHTML = `<span>${esc(msg)}</span>${opts.undo? `<button id="toastUndo">${esc(opts.undoLabel||'Annuler')}</button>`:''}`;
+  if(opts.undo) toastEl.querySelector('#toastUndo').addEventListener('click', ()=>{ hideToast(); opts.undo(); });
+  toastEl.classList.add('show');
+  toastTimer = setTimeout(hideToast, opts.undo? 7000 : 4000);
+}
+function hideToast(){ toastEl.classList.remove('show'); }
+
+/* ===================== Import / export ===================== */
+function download(name, content, type){
+  const blob = new Blob([content], {type});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+}
+const csvJoin = rows => '﻿' + rows.map(r => r.map(v=>{
+  v = String(v ?? '');
+  if(/^[=+@\t\r]/.test(v)) v = "'" + v; // empêche Excel d'interpréter la cellule comme une formule
+  return /[";\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+}).join(';')).join('\r\n');
+const csvNum = n => String(Math.round((Number(n)||0)*100)/100).replace('.',',');
+
+function exportJson(){
+  db.lastExport = new Date().toISOString();
+  try { localStorage.setItem(KEY, JSON.stringify(db)); } catch(e){ /* stockage plein : le téléchargement doit quand même partir */ }
+  download('asgb-tresorerie-'+todayISO()+'.json', JSON.stringify(db, null, 2), 'application/json');
+  toast('Sauvegarde exportée. Conservez ce fichier en lieu sûr.');
+  render();
+}
+function importJson(file){
+  const rd = new FileReader();
+  rd.onload = () => {
+    let data;
+    try { data = JSON.parse(rd.result); } catch(e){ toast('Fichier illisible : ce n’est pas une sauvegarde valide.'); return; }
+    if(!data || !Array.isArray(data.membres) || !Array.isArray(data.paiements) || !data.settings){
+      toast('Ce fichier ne ressemble pas à une sauvegarde de trésorerie ASGB.'); return;
+    }
+    confirmDlg({
+      title:'Restaurer cette sauvegarde ?',
+      message:`Elle contient <strong>${data.membres.length} membres</strong>, <strong>${data.paiements.length} paiements</strong> et <strong>${(data.operations||[]).length} opérations</strong>.<br><br>Les données actuelles de ce navigateur (${db.membres.length} membres, ${db.paiements.length} paiements) seront <strong>remplacées</strong>.`,
+      okLabel:'Remplacer les données',
+      onOk(){
+        hideToast();
+        db = normaliser(data);
+        const crees = autoEncaisse(); // rattrape les virements permanents depuis la date de la sauvegarde
+        commit();
+        toast('Sauvegarde restaurée.' + (crees.length? ` ${crees.length} cotisation${crees.length>1?'s':''} automatique${crees.length>1?'s':''} ajoutée${crees.length>1?'s':''} (virement permanent).` : ''),
+          crees.length? {undoLabel:'Annuler les automatiques', undo(){ undoAuto(crees); }} : undefined);
+      }
+    });
+  };
+  rd.readAsText(file);
+}
+function csvMembres(){
+  const rows = [['Nom','Prénom','Téléphone','Membre depuis','Statut','Cotisation mensuelle','Note']];
+  for(const m of membresTries()) rows.push([m.nom, m.prenom, m.tel, m.adhesion, m.statut, csvNum(m.cotisation), m.note]);
+  download('asgb-membres-'+todayISO()+'.csv', csvJoin(rows), 'text/csv;charset=utf-8');
+}
+function csvCot(){
+  const Y = ui.annee, pm = payMap();
+  const rows = [['Membre', ...MOIS, 'Total payé '+Y]];
+  for(const m of membresTries()){
+    let tot=0; const r=[nomComplet(m)];
+    for(let mo=0;mo<12;mo++){
+      const p = pm.get(payKey(m.id,Y,mo));
+      if(p){ r.push(csvNum(p.montant)); tot+=p.montant; }
+      else r.push(estDu(m,Y,mo)? (moisEcoule(Y,mo)?'RETARD':'') : '-');
+    }
+    r.push(csvNum(tot)); rows.push(r);
+  }
+  download('asgb-cotisations-'+Y+'.csv', csvJoin(rows), 'text/csv;charset=utf-8');
+}
+function csvJournal(){
+  const mById = new Map(db.membres.map(m=>[m.id,m]));
+  const rows = [['Date','Type','Catégorie','Libellé','Mode','Montant','Note']];
+  const all = [
+    ...db.paiements.map(p=>({date:p.date, t:'Recette', c:'Cotisation', l:'Cotisation '+MOIS[p.mois]+' '+p.annee+' — '+nomComplet(mById.get(p.membreId)||{nom:'?'}), mo:p.mode, mt:p.montant, n:''})),
+    ...db.operations.map(o=>({date:o.date, t:o.sens==='recette'?'Recette':'Dépense', c:o.categorie, l:o.libelle, mo:o.mode, mt:o.sens==='recette'?o.montant:-o.montant, n:o.note}))
+  ].sort((a,b)=> String(a.date).localeCompare(String(b.date)));
+  for(const r of all) rows.push([r.date, r.t, r.c, r.l, r.mo, csvNum(r.mt), r.n]);
+  download('asgb-journal-'+todayISO()+'.csv', csvJoin(rows), 'text/csv;charset=utf-8');
+}
+
+/* ===================== Synchronisation en ligne (partage bureau) ===================== */
+const SYNC_KEY = 'asgb-tresorerie-sync';
+const sync = { cfg: null, es: null, etat: 'off', pushTimer: null, lastPushedRev: 0 };
+try { sync.cfg = JSON.parse(localStorage.getItem(SYNC_KEY)) || null; } catch(e){ sync.cfg = null; }
+
+const syncActif = () => !!(sync.cfg && sync.cfg.actif && sync.cfg.url && sync.cfg.code);
+const syncEndpoint = () => sync.cfg.url.replace(/\/+$/,'') + '/asgb/' + encodeURIComponent(sync.cfg.code) + '.json';
+function syncSaveCfg(){ try { localStorage.setItem(SYNC_KEY, JSON.stringify(sync.cfg)); } catch(e){} }
+
+function setSyncEtat(etat){
+  const avant = sync.etat;
+  sync.etat = etat;
+  const pill = document.getElementById('syncPill');
+  if(pill){
+    pill.hidden = (etat === 'off');
+    pill.dataset.etat = etat;
+    const b = pill.querySelector('b');
+    if(b) b.textContent = (etat === 'ok') ? 'Synchronisé' : 'Hors ligne';
+    pill.title = (etat === 'ok') ? 'Connecté à la base partagée : les modifications circulent automatiquement.'
+               : (etat === 'hors-ligne') ? 'Base partagée injoignable — vos saisies restent enregistrées sur cet appareil et repartiront à la reconnexion.' : '';
+  }
+  if(avant !== etat && ui.tab === 'save') render();
+}
+
+function syncPushSoon(){
+  if(!syncActif()) return;
+  clearTimeout(sync.pushTimer);
+  sync.pushTimer = setTimeout(syncPushNow, 600);
+}
+function syncPushNow(){
+  if(!syncActif()) return;
+  const rev = db.rev || 0;
+  fetch(syncEndpoint(), { method:'PUT', body: JSON.stringify(db) })
+    .then(r => { if(!r.ok) throw new Error(r.status); sync.lastPushedRev = rev; setSyncEtat('ok'); })
+    .catch(() => setSyncEtat('hors-ligne'));
+}
+function syncApplyRemote(data){
+  if(data == null){ syncPushNow(); return; } // base en ligne encore vide : on y dépose nos données
+  if(data.updatedAt && data.updatedAt === db.updatedAt){ setSyncEtat('ok'); return; } // écho de notre propre envoi
+  const rDist = Math.floor(Number(data.rev) || 0), rLoc = db.rev || 0;
+  const distantGagne = rDist > rLoc || (rDist === rLoc && String(data.updatedAt || '') > String(db.updatedAt || ''));
+  if(distantGagne){
+    db = normaliser(data);
+    try { localStorage.setItem(KEY, JSON.stringify(db)); } catch(e){}
+    render();
+    setSyncEtat('ok');
+  } else {
+    syncPushSoon(); // notre version est plus récente : on la renvoie
+  }
+}
+function syncStop(){
+  if(sync.es){ sync.es.close(); sync.es = null; }
+  clearTimeout(sync.pushTimer);
+  setSyncEtat('off');
+}
+function syncStart(){
+  syncStop();
+  if(!syncActif()) return;
+  setSyncEtat('hors-ligne');
+  const refetch = () => fetch(syncEndpoint()).then(r=>r.json()).then(syncApplyRemote).catch(()=> setSyncEtat('hors-ligne'));
+  refetch();
+  try {
+    const es = new EventSource(syncEndpoint());
+    sync.es = es;
+    es.addEventListener('put', ev => {
+      try { const m = JSON.parse(ev.data); (m && m.path === '/') ? syncApplyRemote(m.data) : refetch(); } catch(e){}
+    });
+    es.addEventListener('patch', refetch);
+    es.onopen = () => { setSyncEtat('ok'); if((db.rev || 0) > sync.lastPushedRev) syncPushSoon(); };
+    es.onerror = () => setSyncEtat('hors-ligne'); // EventSource retente tout seul
+  } catch(e){ setSyncEtat('hors-ligne'); }
+}
+window.addEventListener('online', () => { if(syncActif()) syncPushSoon(); });
+
+const REGLES_FIREBASE = code => JSON.stringify({rules:{asgb:{[code]:{'.read':true,'.write':true}}}}, null, 2);
+function texteInvitation(){
+  return `Trésorerie ASGB — accès partagé\n\n1) Ouvre l'outil de trésorerie (fichier tresorerie.html ou lien fourni)\n2) Onglet « Sauvegarde » → carte « Travailler à plusieurs »\n3) Adresse de la base : ${sync.cfg.url}\n4) Code d'équipe : ${sync.cfg.code}\n5) Clique sur « Activer la synchronisation »\n\nEnsuite, toute modification faite par l'un apparaît automatiquement chez l'autre. Garde le code d'équipe confidentiel.`;
+}
+function syncGuideModal(){
+  let code = (document.getElementById('syncCode') || {}).value || (sync.cfg && sync.cfg.code) || '';
+  if(!code){ code = (uid()+uid()).replace(/[^a-z0-9]/gi,'').slice(0,32); const inp = document.getElementById('syncCode'); if(inp) inp.value = code; }
+  openModal(`${modalHead('Guide — mettre en place le partage (une seule fois)')}
+    <div class="modal-b" style="font-size:14px;line-height:1.65">
+      <ol style="margin-left:20px;display:grid;gap:10px">
+        <li>Ouvrez <strong>console.firebase.google.com</strong> et connectez-vous avec un compte Google (idéalement celui de l'association).</li>
+        <li>Cliquez « <strong>Créer un projet</strong> » → nom : <strong>asgb-tresorerie</strong> → désactivez Google Analytics → Créer.</li>
+        <li>Menu de gauche : <strong>Créer &gt; Realtime Database</strong> → « Créer une base de données » → emplacement <strong>Belgique (europe-west1)</strong> → démarrer en <strong>mode verrouillé</strong>.</li>
+        <li>Ouvrez l'onglet « <strong>Règles</strong> » de la base, remplacez tout le contenu par le texte ci-dessous, puis « Publier » :
+          <textarea class="input" readonly rows="9" id="guideRegles" style="font-family:monospace;font-size:12.5px;margin-top:6px">${esc(REGLES_FIREBASE(code))}</textarea>
+          <button type="button" class="btn btn-sm btn-ghost" data-copie="#guideRegles" style="margin-top:6px">Copier les règles</button>
+        </li>
+        <li>Onglet « <strong>Données</strong> » : copiez l'adresse qui commence par <strong>https://…firebasedatabase.app</strong> et collez-la dans le champ « Adresse de la base en ligne » de l'outil.</li>
+        <li>Cliquez « <strong>Activer la synchronisation</strong> ». Vos données actuelles partent en ligne, puis tout est automatique.</li>
+      </ol>
+      <p class="hint" style="margin-top:10px;color:var(--soft)">Gratuit pour un usage associatif. Les données sont hébergées en Europe. Le code d'équipe inscrit dans les règles est la clé d'accès : ne le partagez qu'avec le bureau.</p>
+    </div>
+    <div class="modal-f"><span class="spacer"></span><button class="btn btn-primary" data-close-btn>J'ai terminé</button></div>`);
+}
+function syncInvitationModal(){
+  openModal(`${modalHead('Invitation pour le trésorier')}
+    <div class="modal-b">
+      <p style="font-size:14px;margin-bottom:10px">Transmettez-lui ce message (et le fichier <strong>tresorerie.html</strong> s'il ne l'a pas déjà) :</p>
+      <textarea class="input" readonly rows="11" id="invitTexte" style="font-size:13px">${esc(texteInvitation())}</textarea>
+      <button type="button" class="btn btn-sm btn-ghost" data-copie="#invitTexte" style="margin-top:8px">Copier le message</button>
+      <p class="hint" style="margin-top:10px;color:var(--soft)">Une fois activé chez lui, vous verrez chacun les saisies de l'autre en direct.</p>
+    </div>
+    <div class="modal-f"><span class="spacer"></span><button class="btn btn-primary" data-close-btn>Fermer</button></div>`);
+}
+
+/* ===================== Événements ===================== */
+document.addEventListener('click', e=>{
+  const copie = e.target.closest('[data-copie]');
+  if(copie){
+    const ta = document.querySelector(copie.dataset.copie);
+    if(ta){
+      const fini = ok => toast(ok ? 'Copié dans le presse-papiers.' : 'Sélectionnez le texte puis Ctrl/Cmd+C.');
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(()=>fini(true), ()=>{ ta.focus(); ta.select(); fini(false); }); }
+      else { ta.focus(); ta.select(); try { fini(document.execCommand('copy')); } catch(err){ fini(false); } }
+    }
+    return;
+  }
+  const closeBtn = e.target.closest('[data-close-btn]');
+  if(closeBtn){ closeModal(); return; }
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  const act = el.dataset.act;
+  switch(act){
+    case 'tab': ui.tab = el.dataset.tab; render(); window.scrollTo({top:0}); break;
+    case 'year': ui.annee = Math.max(2020, Math.min(2100, ui.annee + Number(el.dataset.d))); render(); break;
+    case 'member-new': memberModal(null); break;
+    case 'member-edit': memberModal(el.dataset.id); break;
+    case 'cell': cellAction(el.dataset.id, +el.dataset.mois); break;
+    case 'mois-all': encaisserMois(+el.dataset.annee, +el.dataset.mois); break;
+    case 'pointage': pointageModal(); break;
+    case 'op-new': opModal(null); break;
+    case 'op-edit': opModal(el.dataset.id); break;
+    case 'op-del': {
+      const o = db.operations.find(x=>x.id===el.dataset.id);
+      if(o) confirmDlg({title:'Supprimer cette opération ?', message:`<strong>${esc(o.libelle)}</strong> (${frDate(o.date)}, ${eur(o.montant)}) sera supprimée du journal.`, okLabel:'Supprimer',
+        onOk(){ db.operations = db.operations.filter(x=>x.id!==o.id); commit(); toast('Opération supprimée.'); }});
+      break;
+    }
+    case 'goto-cot': ui.tab='cot'; ui.qCot = el.dataset.q||''; render(); window.scrollTo({top:0}); break;
+    case 'chart-toggle': ui.chartTable = !ui.chartTable; render(); break;
+    case 'print': window.print(); break;
+    case 'export-json': exportJson(); break;
+    case 'import-json': document.getElementById('importFile').click(); break;
+    case 'csv-membres': csvMembres(); break;
+    case 'csv-cot': csvCot(); break;
+    case 'csv-journal': csvJournal(); break;
+    case 'sync-generer': {
+      const inp = document.getElementById('syncCode');
+      if(inp) inp.value = (uid()+uid()).replace(/[^a-z0-9]/gi,'').slice(0,32);
+      break;
+    }
+    case 'sync-guide': syncGuideModal(); break;
+    case 'sync-activer': {
+      const url = ((document.getElementById('syncUrl')||{}).value||'').trim();
+      const code = ((document.getElementById('syncCode')||{}).value||'').trim();
+      if(!/^https:\/\/[\w.-]+/.test(url)){ toast('Adresse invalide — elle doit commencer par https:// (voir le guide).'); break; }
+      if(code.length < 12 || /[^\w-]/.test(code)){ toast('Code d’équipe invalide — utilisez le bouton « Générer ».'); break; }
+      sync.cfg = { url, code, actif: true };
+      syncSaveCfg(); syncStart(); render();
+      toast('Synchronisation activée : vos données vont être partagées automatiquement.');
+      break;
+    }
+    case 'sync-invitation': syncInvitationModal(); break;
+    case 'sync-desactiver':
+      confirmDlg({
+        title: 'Désactiver la synchronisation ?',
+        message: 'Cet appareil cessera d’envoyer et de recevoir les modifications. Les données restent enregistrées ici, et la base en ligne n’est pas effacée.',
+        okLabel: 'Désactiver',
+        onOk(){ if(sync.cfg) sync.cfg.actif = false; syncSaveCfg(); syncStop(); render(); toast('Synchronisation désactivée.'); }
+      });
+      break;
+    case 'reset-all':
+      confirmDlg({
+        title:'Tout effacer ?',
+        message:`<strong>Toutes les données</strong> (${db.membres.length} membres, ${db.paiements.length} paiements, ${db.operations.length} opérations) seront supprimées définitivement de ce navigateur.<br><br>Exportez d'abord une sauvegarde JSON si vous voulez pouvoir revenir en arrière.`,
+        okLabel:'Tout effacer définitivement',
+        onOk(){ hideToast(); db = defaultDb(); commit(); toast('Données effacées.'); }
+      });
+      break;
+  }
+});
+
+document.addEventListener('input', e=>{
+  if(e.isComposing) return; // ne pas re-rendre au milieu d'une composition (accents par touche morte)
+  const k = e.target.dataset.input;
+  if(!k) return;
+  if(k==='qMembres'||k==='qCot'||k==='qJournal'){
+    ui[k] = e.target.value;
+    // re-rendu léger avec conservation du focus
+    const pos = e.target.selectionStart;
+    render();
+    const inp = document.querySelector(`[data-input="${k}"]`);
+    if(inp){ inp.focus(); try{ inp.setSelectionRange(pos,pos); }catch(_){} }
+  }
+});
+document.addEventListener('change', e=>{
+  const k = e.target.dataset.input;
+  if(!k) return;
+  if(k==='fStatut'||k==='fSens'){ ui[k]=e.target.value; render(); }
+  if(k==='rapMois'){ ui.rapMois = +e.target.value; render(); }
+  if(k==='rapAnnee'){ ui.rapAnnee = +e.target.value; render(); }
+});
+document.getElementById('importFile').addEventListener('change', e=>{
+  if(e.target.files[0]) importJson(e.target.files[0]);
+  e.target.value = '';
+});
+document.addEventListener('submit', e=>{
+  if(e.target.id==='formSettings'){
+    e.preventDefault();
+    db.settings.cotisationDefaut = num(document.getElementById('setCot').value);
+    db.settings.soldeInitial = num(document.getElementById('setSolde').value);
+    commit(); toast('Paramètres enregistrés.');
+  }
+});
+
+/* ---------- Multi-onglets & changement de mois ---------- */
+window.addEventListener('storage', e=>{
+  // un autre onglet/fenêtre a enregistré : on recharge son état pour ne rien écraser
+  if(e.key !== KEY || e.newValue == null) return;
+  try { db = normaliser(JSON.parse(e.newValue)); } catch(err){ return; }
+  render();
+});
+document.addEventListener('visibilitychange', ()=>{
+  // page laissée ouverte au-delà d'un changement de mois : on recharge pour recalculer dus/retards/auto
+  if(document.visibilityState !== 'visible') return;
+  const n = new Date();
+  if((n.getFullYear() !== CUR_Y || n.getMonth() !== CUR_M) && !document.querySelector('.modal-backdrop')) location.reload();
+});
+
+/* ---------- Init ---------- */
+document.getElementById('logoTop').innerHTML = LOGO;
+document.getElementById('fav').href = 'data:image/svg+xml;utf8,' + encodeURIComponent(LOGO);
+const autoCrees = autoEncaisse();
+if(autoCrees.length){
+  commit();
+  toast(`${autoCrees.length} cotisation${autoCrees.length>1?'s':''} enregistrée${autoCrees.length>1?'s':''} automatiquement (virement permanent).`,
+    {undoLabel:'Annuler', undo(){ undoAuto(autoCrees); }});
+} else {
+  render();
+}
+syncStart(); // reprend la synchronisation partagée si elle a été activée sur cet appareil
+</script>
+</body>
+</html>
