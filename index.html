@@ -39,8 +39,8 @@
   .brand-name{font-size:19px;font-weight:800;letter-spacing:.04em;color:var(--navy);line-height:1.1}
   .brand-sub{font-size:8px;font-weight:600;letter-spacing:.14em;color:var(--soft);text-transform:uppercase;max-width:180px}
   .nav-links{display:flex;align-items:center;gap:4px}
-  .nav-links a{position:relative;display:block;padding:10px 13px;font-size:13.5px;font-weight:500;color:var(--body);border-radius:8px;transition:color .25s, background-color .25s}
-  .nav-links a::after{content:"";position:absolute;left:13px;right:13px;bottom:5px;height:2px;background:var(--gold);border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+  .nav-links a{position:relative;display:block;padding:10px 11px;font-size:13px;font-weight:500;color:var(--body);border-radius:8px;transition:color .25s, background-color .25s}
+  .nav-links a::after{content:"";position:absolute;left:11px;right:11px;bottom:5px;height:2px;background:var(--gold);border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.4,0,.2,1)}
   .nav-links a:hover{color:var(--navy);background:rgba(18,35,75,.045)}
   .nav-links a:hover::after{transform:scaleX(1)}
   .nav-links a.active{color:var(--navy);font-weight:600}
@@ -129,6 +129,21 @@
   .chip-gold{background:var(--gold-soft)}     .chip-gold svg{stroke:var(--gold)}
   .card h3{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:8px}
   .card p{font-size:14px;color:var(--body)}
+
+  /* ---------- Solidarité internationale ---------- */
+  .section.intl{background:var(--navy);color:#DDE3F0}
+  .intl h2{color:#fff}
+  .intl .lead{color:#B9C2D8}
+  .intl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+  .intl-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:var(--radius);padding:28px 24px;text-align:left;transition:transform .25s, background-color .25s}
+  .intl-card:hover{transform:translateY(-5px);background:rgba(255,255,255,.11)}
+  .intl-card .icon-chip{background:rgba(201,162,75,.18)}
+  .intl-card .icon-chip svg{stroke:var(--gold)}
+  .intl-card h3{color:#fff;font-size:16.5px;font-weight:700;margin-bottom:8px}
+  .intl-card p{font-size:14px;color:#B9C2D8}
+  .intl-flags{display:inline-flex;align-items:center;gap:12px;margin-top:36px;font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8E99B5}
+  .flag{display:inline-flex;gap:4px}
+  .flag i{width:8px;height:8px;border-radius:50%}
 
   /* ---------- Événements ---------- */
   .events{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
@@ -262,6 +277,7 @@
     <nav class="nav-links" aria-label="Navigation principale">
       <a href="#accueil" class="active">Accueil</a>
       <a href="#mission">Mission</a>
+      <a href="#solidarite">Solidarité</a>
       <a href="#valeurs">Valeurs</a>
       <a href="#actions">Actions</a>
       <a href="#evenements">Événements</a>
@@ -277,6 +293,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="#accueil" class="active">Accueil</a>
   <a href="#mission">Mission</a>
+  <a href="#solidarite">Solidarité</a>
   <a href="#valeurs">Valeurs</a>
   <a href="#actions">Actions</a>
   <a href="#evenements">Événements</a>
@@ -318,7 +335,7 @@
     <div class="mission-grid">
       <div class="mission-text reveal">
         <p>L&rsquo;<strong>Alliance Solidarité des Guinéens de Besançon (ASGB)</strong> rassemble les Guinéennes et les Guinéens de Besançon et de sa région autour d&rsquo;un même idéal : <strong>la solidarité</strong>. Fondée en 2023, l&rsquo;association s&rsquo;est donné pour mission d&rsquo;unir la communauté, de soutenir chacun de ses membres dans les moments importants de la vie et de favoriser leur pleine intégration dans la cité.</p>
-        <p>L&rsquo;ASGB œuvre au quotidien pour <strong>l&rsquo;entraide</strong> entre ses membres, <strong>l&rsquo;accompagnement</strong> des nouveaux arrivants, la <strong>transmission de la culture guinéenne</strong> aux jeunes générations et le <strong>dialogue</strong> avec l&rsquo;ensemble des habitants de Besançon. Elle se veut un pont entre la Guinée et la Franche-Comté : fière de ses racines, pleinement engagée dans sa ville.</p>
+        <p>L&rsquo;ASGB œuvre au quotidien pour <strong>l&rsquo;entraide</strong> entre ses membres, <strong>l&rsquo;accompagnement</strong> des nouveaux arrivants, la <strong>transmission de la culture guinéenne</strong> aux jeunes générations et le <strong>dialogue</strong> avec l&rsquo;ensemble des habitants de Besançon. Elle se veut un pont entre la Guinée et la Franche-Comté : fière de ses racines, pleinement engagée dans sa ville. Au-delà de Besançon, elle porte une mission de <strong>solidarité internationale</strong> entre la France et la Guinée.</p>
       </div>
       <aside class="fact-card reveal">
         <h3>L&rsquo;association en bref</h3>
@@ -364,6 +381,52 @@
           <div class="br">Secrétaire</div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SOLIDARITÉ INTERNATIONALE ================= -->
+<section class="section intl center" id="solidarite">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">Solidarité internationale</span>
+      <h2>Un pont entre la France et la Guinée</h2>
+      <p class="lead">Au-delà de Besançon, l&rsquo;ASGB agit pour la solidarité internationale entre la France et la Guinée, autour de quatre missions principales.</p>
+    </div>
+    <div class="intl-grid">
+      <article class="intl-card reveal">
+        <div class="icon-chip">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="2.8"/><circle cx="16.5" cy="10" r="2.2"/><path d="M4.5 19.5c.5-3.4 2.3-5.2 4.5-5.2 1.3 0 2.4.6 3.2 1.7M13.5 19.5c.4-2.6 1.7-4 3.4-4s2.8 1.4 3.2 4"/></svg>
+        </div>
+        <h3>Soutien aux enfants orphelins</h3>
+        <p>Santé, nutrition et logement : un accompagnement concret pour offrir aux enfants orphelins un quotidien digne.</p>
+      </article>
+      <article class="intl-card reveal">
+        <div class="icon-chip">
+          <svg viewBox="0 0 24 24"><path d="M3 9.5 12 5l9 4.5-9 4.5Z"/><path d="M7 11.5V16c1.7 1.7 8.3 1.7 10 0v-4.5M21 9.5V14"/></svg>
+        </div>
+        <h3>Appui à l&rsquo;éducation</h3>
+        <p>Financement de matériel scolaire et rénovation d&rsquo;infrastructures pour donner à chaque enfant les moyens d&rsquo;apprendre.</p>
+      </article>
+      <article class="intl-card reveal">
+        <div class="icon-chip">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.7 2.5 14.3 0 17-2.5-2.7-2.5-14.3 0-17Z"/></svg>
+        </div>
+        <h3>Projets humanitaires et sociaux</h3>
+        <p>Développement de projets humanitaires et sociaux locaux, au plus près des besoins des communautés en Guinée.</p>
+      </article>
+      <article class="intl-card reveal">
+        <div class="icon-chip">
+          <svg viewBox="0 0 24 24"><path d="M8 4h8v4a4 4 0 0 1-8 0Z"/><path d="M8 5H5.5a2.6 2.6 0 0 0 2.7 3M16 5h2.5a2.6 2.6 0 0 1-2.7 3M12 12v3.5M8.5 19.5c.4-2.4 1.7-4 3.5-4s3.1 1.6 3.5 4Z"/></svg>
+        </div>
+        <h3>Événements culturels et sportifs</h3>
+        <p>Des rendez-vous festifs et sportifs organisés pour lever des fonds au service de ces missions.</p>
+      </article>
+    </div>
+    <div class="intl-flags reveal">
+      <span class="flag"><i style="background:#3757A6"></i><i style="background:#F2F2F2"></i><i style="background:#D64550"></i></span>
+      France ↔ Guinée
+      <span class="flag"><i style="background:#C31B2B"></i><i style="background:#E9A825"></i><i style="background:#1F8A45"></i></span>
     </div>
   </div>
 </section>
@@ -610,6 +673,7 @@
         <h4>Liens rapides</h4>
         <ul class="foot-links">
           <li><a href="#mission">Notre mission</a></li>
+          <li><a href="#solidarite">Solidarité internationale</a></li>
           <li><a href="#valeurs">Nos valeurs</a></li>
           <li><a href="#actions">Nos actions</a></li>
           <li><a href="#evenements">Événements</a></li>
@@ -658,7 +722,7 @@
 
   // Onglet actif (scrollspy)
   var links = document.querySelectorAll('.nav-links a, .mobile-menu a[href^="#"]:not(.nav-cta)');
-  var sections = ['accueil','mission','valeurs','actions','evenements','adhesion','contact']
+  var sections = ['accueil','mission','solidarite','valeurs','actions','evenements','adhesion','contact']
     .map(function(id){ return document.getElementById(id); });
   var spy = new IntersectionObserver(function(entries){
     entries.forEach(function(e){
